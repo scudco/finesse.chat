@@ -12,4 +12,8 @@ Rails.application.routes.draw do
   # get "service-worker" => "rails/pwa#service_worker", as: :pwa_service_worker
 
   root "messages#index"
+
+  # Silence Chrome DevTools well-known probe.
+  get "/.well-known/appspecific/com.chrome.devtools.json",
+      to: proc { [204, {}, []] }
 end
