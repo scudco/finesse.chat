@@ -1,0 +1,17 @@
+@import "tailwindcss";
+
+/* Own messages: right-aligned blue bubble */
+[data-own="true"] {
+  align-items: flex-end;
+}
+[data-own="true"] .message-author {
+  display: none;
+}
+[data-own="true"] .message-time {
+  margin-left: auto;
+}
+[data-own="true"] .message-bubble {
+  background-color: #3b82f6; /* blue-500 */
+  color: white;
+  border-color: transparent;
+}

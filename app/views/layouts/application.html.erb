@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title><%= content_for(:title) || "Finesse" %></title>
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="application-name" content="Finesse">
+    <meta name="mobile-web-app-capable" content="yes">
+    <%= csrf_meta_tags %>
+    <%= csp_meta_tag %>
+
+    <%= yield :head %>
+
+    <%# Enable PWA manifest for installable apps (make sure to enable in config/routes.rb too!) %>
+    <%#= tag.link rel: "manifest", href: pwa_manifest_path(format: :json) %>
+
+    <link rel="icon" href="/icon.png" type="image/png">
+    <link rel="icon" href="/icon.svg" type="image/svg+xml">
+    <link rel="apple-touch-icon" href="/icon.png">
+
+    <%# Includes all stylesheet files in app/assets/stylesheets %>
+    <%= stylesheet_link_tag :app, "data-turbo-track": "reload" %>
+    <%= javascript_importmap_tags %>
+  </head>
+
+  <body>
+    <nav class="fixed top-0 w-full h-14 bg-white border-b border-gray-200 flex items-center justify-between px-6 z-10">
+      <span class="font-semibold text-gray-800">Finesse</span>
+      <div class="flex items-center gap-3">
+        <span class="text-sm text-gray-500">
+          Signed in as <strong class="text-gray-800"><%= current_username %></strong>
+        </span>
+        <%= button_to "Log out", session_path, method: :delete,
+              class: "text-xs px-3 py-1.5 rounded-md bg-gray-100 hover:bg-gray-200 text-gray-700 cursor-pointer font-medium" %>
+      </div>
+    </nav>
+    <main class="container mx-auto mt-14 px-5 flex">
+      <%= yield %>
+    </main>
+  </body>
+</html>
