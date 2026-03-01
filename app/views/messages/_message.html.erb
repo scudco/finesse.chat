@@ -1,4 +1,6 @@
-<div id="<%= dom_id message %>" class="flex flex-col" data-author="<%= message.author %>">
+<%# locals: (message:, current_user: nil) %>
+<div id="<%= dom_id message %>" class="flex flex-col" data-author="<%= message.author %>"
+     <%= "data-own=true" if current_user == message.author %>>
   <div class="flex items-baseline justify-between gap-2 mb-1">
     <span class="message-author font-semibold text-sm truncate"
           title="<%= message.author.presence || "Anonymous" %>"><%= message.author.presence || "Anonymous" %></span>
