@@ -2,14 +2,26 @@
 
 <div class="flex flex-col h-[calc(100vh-3.5rem)] max-w-2xl mx-auto px-4"
      data-controller="chat"
-     data-chat-current-user-value="<%= current_username %>">
+     data-chat-current-user-value="<%= current_username %>"
+     data-chat-older-url-value="<%= older_messages_path %>">
   <turbo-stream-source src="<%= sse_stream_url("chat") %>"></turbo-stream-source>
 
   <h1 class="text-2xl font-bold py-4 shrink-0">Finesse Chat</h1>
 
-  <div class="flex-1 overflow-y-auto border rounded-xl bg-gray-50 mb-4" data-chat-target="scroll">
-    <div id="messages" class="flex flex-col justify-end min-h-full space-y-4 p-4">
-      <%= render @messages %>
+  <div class="flex-1 overflow-y-auto border rounded-xl bg-gray-50 mb-4 invisible"
+       data-chat-target="scroll"
+       data-action="scroll->chat#onScroll">
+    <div class="text-center text-xs text-gray-400 pt-3 pb-1 hidden" data-chat-target="loadOlder">
+      Loading older messages…
+    </div>
+    <div id="messages" class="flex flex-col justify-end min-h-full space-y-4 p-4" data-chat-target="messages">
+      <%= render @messages, current_user: current_username %>
+    </div>
+    <div data-chat-target="jumpButton" class="sticky bottom-4 flex justify-center hidden">
+      <button data-action="click->chat#jumpToPresent"
+              class="bg-blue-600 hover:bg-blue-500 text-white text-sm font-medium px-4 py-2 rounded-full shadow-lg cursor-pointer">
+        ↓ Jump to present
+      </button>
     </div>
   </div>
 
