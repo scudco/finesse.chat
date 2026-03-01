@@ -3,7 +3,12 @@ class MessagesController < ApplicationController
 
   # GET /messages or /messages.json
   def index
-    @messages = Message.order(:created_at)
+    @messages = Message.order(:id).last(50)
+  end
+
+  # GET /messages/older?before_id=N  (turbo stream)
+  def older
+    @messages = Message.where(id: ...params[:before_id].to_i).order(id: :desc).limit(50).reverse
   end
 
   # GET /messages/1 or /messages/1.json
