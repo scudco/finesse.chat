@@ -14,7 +14,7 @@ import (
 	_ "modernc.org/sqlite"
 )
 
-const pollInterval = 100 * time.Millisecond
+const pollInterval = 10 * time.Millisecond
 
 func main() {
 	dbPath := os.Getenv("CABLE_DB_PATH")
