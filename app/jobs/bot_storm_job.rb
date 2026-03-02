@@ -1,5 +1,5 @@
 class BotStormJob < ApplicationJob
-  BOTS = %w[Beeper Zappy Clank Whirr Bloop Fizzbot Zork Glitch Nibble Voltron].freeze
+  BOTS = %w[Beeper Zappy Clanker Whirr Bloop Fizzbot Zork Glitch Nibble Voltron].freeze
   MESSAGES = [
     "beep boop 🤖",
     "I am a bot",
