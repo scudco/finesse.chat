@@ -19,10 +19,11 @@ module ApplicationHelper
       safe_links_only: true,   # block javascript: / data: hrefs
       link_attributes: { target: "_blank", rel: "noopener noreferrer" }
     ),
-    no_intra_emphasis:       true,  # don't italicise foo_bar_baz
-    strikethrough:           true,  # ~~deleted~~
-    autolink:                true,  # bare URLs become links
-    disable_indented_code_blocks: true  # 4-space indent stays as text
+    no_intra_emphasis:            true,  # don't italicise foo_bar_baz
+    strikethrough:                true,  # ~~deleted~~
+    autolink:                     true,  # bare URLs become links
+    fenced_code_blocks:           true,  # ```lang ... ``` blocks
+    disable_indented_code_blocks: true   # 4-space indent stays as text
   ).freeze
 
   ALLOWED_TAGS  = %w[strong em del br p ul ol li a code pre blockquote].freeze
