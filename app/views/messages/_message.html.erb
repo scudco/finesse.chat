@@ -13,7 +13,7 @@
         datetime="<%= message.created_at.iso8601 %>"
         data-controller="local-time"><%= message.created_at.strftime("%H:%M") %></time>
   </div>
-  <div class="text-gray-800 max-w-0 min-w-full [overflow-wrap:anywhere]">
-    <%= message.content %>
+  <div class="text-gray-800 max-w-0 min-w-full [overflow-wrap:anywhere] chat-content">
+    <%= render_chat_markdown(message.content) %>
   </div>
 </div>
