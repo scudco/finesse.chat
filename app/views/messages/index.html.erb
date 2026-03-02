@@ -8,13 +8,13 @@
 
   <h1 class="text-2xl font-bold py-4 shrink-0">Finesse Chat</h1>
 
-  <div class="flex-1 overflow-y-auto border rounded-xl bg-gray-50 mb-4 invisible"
+  <div class="flex-1 overflow-y-auto overflow-x-hidden border rounded-sm bg-gray-50 mb-4 opacity-0 transition-opacity duration-600"
        data-chat-target="scroll"
        data-action="scroll->chat#onScroll">
     <div class="text-center text-xs text-gray-400 pt-3 pb-1 hidden" data-chat-target="loadOlder">
       Loading older messages…
     </div>
-    <div id="messages" class="flex flex-col justify-end min-h-full space-y-4 p-4" data-chat-target="messages">
+    <div id="messages" class="flex flex-col justify-end min-h-full space-y-1" data-chat-target="messages">
       <%= render @messages, current_user: current_username %>
     </div>
     <div data-chat-target="jumpButton" class="sticky bottom-4 flex justify-center hidden">
