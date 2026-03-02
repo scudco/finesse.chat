@@ -13,11 +13,15 @@
   <div class="shrink-0 pt-4 pb-2">
     <div class="flex items-center justify-between">
       <h1 class="text-2xl font-bold">Finesse Chat</h1>
-      <div class="flex text-xs font-medium rounded-lg overflow-hidden border border-gray-200">
-        <% [["none", "Polling"], ["ws", "WS"], ["sse", "SSE"]].each do |value, label| %>
-          <%= link_to label, messages_path(transport: value),
-                class: "px-3 py-1.5 #{@transport == value ? "bg-blue-600 text-white" : "bg-white text-gray-500 hover:bg-gray-50"}" %>
-        <% end %>
+      <div class="flex items-center gap-2">
+        <%= button_to "⚡ Bot Storm", bot_storm_messages_path,
+              class: "rounded-lg px-3 py-1.5 bg-red-500 hover:bg-red-400 text-white text-xs font-medium cursor-pointer" %>
+        <div class="flex text-xs font-medium rounded-lg overflow-hidden border border-gray-200">
+          <% [["none", "Polling"], ["ws", "WS"], ["sse", "SSE"]].each do |value, label| %>
+            <%= link_to label, messages_path(transport: value),
+                  class: "px-3 py-1.5 #{@transport == value ? "bg-blue-600 text-white" : "bg-white text-gray-500 hover:bg-gray-50"}" %>
+          <% end %>
+        </div>
       </div>
     </div>
     <p class="text-xs text-gray-400 mt-1">Chat is reset every 30 minutes (<span data-controller="countdown"></span> left)</p>

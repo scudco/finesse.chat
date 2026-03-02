@@ -50,7 +50,7 @@ export default class extends Controller {
   }
 
   jumpToPresent() {
-    this.scrollToBottom()
+    this.scrollToBottom("smooth")
     this.hideJumpButton()
   }
 
@@ -192,9 +192,9 @@ export default class extends Controller {
     return div
   }
 
-  scrollToBottom() {
+  scrollToBottom(behavior = "instant") {
     this.scrollingToBottom = true
-    this.scrollTarget.scrollTo({ top: this.scrollTarget.scrollHeight, behavior: "smooth" })
+    this.scrollTarget.scrollTo({ top: this.scrollTarget.scrollHeight, behavior })
   }
 
   isAtBottom() {
