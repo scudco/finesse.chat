@@ -1,13 +1,13 @@
 <%# locals: (message:, current_user: nil) %>
-<%- author = message.author.presence || "Anonymous" %>
+
 <div
     id="<%= dom_id message %>"
     class="flex flex-col px-2 py-1 hover:bg-gray-200"
-    data-author="<%= message.author %>"
     >
   <div class="flex items-baseline justify-between gap-1">
-    <span class="font-semibold text-sm truncate" style="color: <%= author_color(author) %>"
-          title="<%= author %>"><%= author %></span>
+    <span class="font-semibold text-sm truncate"
+          style="color: <%= author_color(message.author) %>"
+          ><%= message.author.presence %></span>
     <span
         class="text-xs text-gray-400 shrink-0"
         title="<%= message.created_at %>"><%= message.created_at.strftime("%H:%M") %></span>
