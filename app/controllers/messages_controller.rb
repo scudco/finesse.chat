@@ -10,6 +10,12 @@ class MessagesController < ApplicationController
     @messages = Message.order(:id).last(50)
   end
 
+  # POST /messages/bot_storm
+  def bot_storm
+    BotStormJob.perform_later
+    head :no_content
+  end
+
   # GET /messages/older?before_id=N  (turbo stream)
   def older
     @messages = Message.where(id: ...params[:before_id].to_i).order(id: :desc).limit(50)

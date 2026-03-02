@@ -3,6 +3,7 @@ Rails.application.routes.draw do
     collection do
       get :older
       get :newer
+      post :bot_storm
     end
   end
   resource :session, only: [:destroy]
