@@ -1,12 +1,18 @@
 <%# locals: (message:, current_user: nil) %>
-<div id="<%= dom_id message %>" class="flex flex-col" data-author="<%= message.author %>"
-     <%= "data-own=true" if current_user == message.author %>>
-  <div class="flex items-baseline justify-between gap-2 mb-1">
-    <span class="message-author font-semibold text-sm truncate"
-          title="<%= message.author.presence || "Anonymous" %>"><%= message.author.presence || "Anonymous" %></span>
-    <span class="message-time text-xs text-gray-400 shrink-0"><%= message.created_at.strftime("%H:%M") %></span>
+<%- author = message.author.presence || "Anonymous" %>
+<div
+    id="<%= dom_id message %>"
+    class="flex flex-col px-2 py-1 hover:bg-gray-200"
+    data-author="<%= message.author %>"
+    >
+  <div class="flex items-baseline justify-between gap-1">
+    <span class="font-semibold text-sm truncate" style="color: <%= author_color(author) %>"
+          title="<%= author %>"><%= author %></span>
+    <span
+        class="text-xs text-gray-400 shrink-0"
+        title="<%= message.created_at %>"><%= message.created_at.strftime("%H:%M") %></span>
   </div>
-  <div class="message-bubble bg-white border rounded-xl px-4 py-2 max-w-prose text-gray-800">
+  <div class="text-gray-800 max-w-0 min-w-full [overflow-wrap:anywhere]">
     <%= message.content %>
   </div>
 </div>

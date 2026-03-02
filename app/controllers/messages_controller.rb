@@ -33,6 +33,7 @@ class MessagesController < ApplicationController
         format.html { redirect_to messages_path }
         format.json { render :show, status: :created, location: @message }
       else
+        format.turbo_stream { render turbo_stream: turbo_stream.replace("message_form", partial: "form", locals: { message: Message.new }) }
         format.html { render :new, status: :unprocessable_entity }
         format.json { render json: @message.errors, status: :unprocessable_entity }
       end

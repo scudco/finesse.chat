@@ -9,10 +9,8 @@ export default class extends Controller {
     this.loadingOlder = false
     this.hasMore      = true
     this.scrollToBottom()
-    requestAnimationFrame(() => this.scrollTarget.classList.remove("invisible"))
-    this.markOwnMessages()
+    requestAnimationFrame(() => this.scrollTarget.classList.remove("opacity-0"))
     this.observer = new MutationObserver(() => {
-      this.markOwnMessages()
       if (this.atBottom) {
         this.trimOldMessages()
         this.scrollToBottom()
@@ -31,6 +29,7 @@ export default class extends Controller {
   onScroll() {
     this.atBottom = this.isAtBottom()
     if (this.atBottom) this.hideJumpButton()
+    else this.showJumpButton()
     this.maybeLoadOlder()
   }
 
@@ -105,11 +104,5 @@ export default class extends Controller {
     while (this.messagesTarget.children.length > 100) {
       this.messagesTarget.firstElementChild.remove()
     }
-  }
-
-  markOwnMessages() {
-    this.scrollTarget.querySelectorAll("[data-author]:not([data-own])").forEach(el => {
-      if (el.dataset.author === this.currentUserValue) el.dataset.own = "true"
-    })
   }
 }
