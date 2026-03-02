@@ -3,10 +3,25 @@
 <div class="flex flex-col h-[calc(100dvh-3.5rem)] w-full max-w-2xl mx-auto px-4"
      data-controller="chat"
      data-chat-older-url-value="<%= older_messages_path %>"
-     data-chat-since-url-value="<%= since_messages_path %>">
-  <turbo-stream-source src="<%= sse_stream_url("chat") %>"></turbo-stream-source>
+     data-chat-newer-url-value="<%= newer_messages_path %>">
+  <% if @transport == "sse" %>
+    <turbo-stream-source src="<%= sse_stream_url("chat") %>"></turbo-stream-source>
+  <% elsif @transport == "ws" %>
+    <%= turbo_stream_from "chat" %>
+  <% end %>
 
-  <h1 class="text-2xl font-bold py-4 shrink-0">Finesse Chat</h1>
+  <div class="shrink-0 pt-4 pb-2">
+    <div class="flex items-center justify-between">
+      <h1 class="text-2xl font-bold">Finesse Chat</h1>
+      <div class="flex text-xs font-medium rounded-lg overflow-hidden border border-gray-200">
+        <% [["none", "Polling"], ["ws", "WS"], ["sse", "SSE"]].each do |value, label| %>
+          <%= link_to label, messages_path(transport: value),
+                class: "px-3 py-1.5 #{@transport == value ? "bg-blue-600 text-white" : "bg-white text-gray-500 hover:bg-gray-50"}" %>
+        <% end %>
+      </div>
+    </div>
+    <p class="text-xs text-gray-400 mt-1">Chat is reset every 30 minutes (<span data-controller="countdown"></span> left)</p>
+  </div>
 
   <div class="flex-1 overflow-y-auto overflow-x-hidden border rounded-sm bg-gray-50 mb-4 opacity-0 transition-opacity duration-600"
        data-chat-target="scroll"
@@ -15,6 +30,7 @@
       Loading older messages…
     </div>
     <div id="messages" class="flex flex-col justify-end min-h-full space-y-1" data-chat-target="messages">
+      <%= render "empty_state" %>
       <%= render @messages, current_user: current_username %>
     </div>
     <div data-chat-target="jumpButton" class="sticky bottom-4 flex justify-center hidden">

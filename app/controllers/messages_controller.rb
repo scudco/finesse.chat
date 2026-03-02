@@ -5,17 +5,22 @@ class MessagesController < ApplicationController
 
   # GET /messages or /messages.json
   def index
+    session[:transport] = params[:transport] if params[:transport].in?(%w[ws sse none])
+    @transport = session[:transport] || "ws"
     @messages = Message.order(:id).last(50)
   end
 
   # GET /messages/older?before_id=N  (turbo stream)
   def older
-    @messages = Message.where(id: ...params[:before_id].to_i).order(id: :desc).limit(50).reverse
+    @messages = Message.where(id: ...params[:before_id].to_i).order(id: :desc).limit(50)
+    render turbo_stream: @messages.map { |m|
+      turbo_stream.prepend("messages", partial: "message", locals: { message: m })
+    }
   end
 
-  # GET /messages/since?after_id=N  (turbo stream, polling fallback)
-  def since
-    @messages = Message.where("id > ?", params[:after_id].to_i).order(:id).limit(50)
+  # GET /messages/newer?after_id=N  (turbo stream, polling fallback)
+  def newer
+    @messages = Message.where(id: params[:after_id].to_i..).order(id: :asc).limit(50)
     render turbo_stream: @messages.map { |m|
       turbo_stream.append("messages", partial: "message", locals: { message: m })
     }
