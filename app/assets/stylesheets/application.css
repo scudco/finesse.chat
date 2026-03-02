@@ -9,6 +9,8 @@
  * Consider organizing styles into separate files for maintainability.
  */
 
+#messages:has([id^="message_"]) .chat-empty-state { display: none; }
+
 .chat-content > p { margin: 0; }
 .chat-content > p + p { margin-top: 0.25rem; }
 .chat-content ul, .chat-content ol { margin: 0.25rem 0 0.25rem 1.25rem; }

@@ -1,5 +1,0 @@
-<% if @messages.any? %>
-  <%= turbo_stream.prepend "messages" do %>
-    <%= render @messages, current_user: current_username %>
-  <% end %>
-<% end %>

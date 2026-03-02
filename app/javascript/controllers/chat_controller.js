@@ -2,7 +2,7 @@ import { Controller } from "@hotwired/stimulus"
 
 export default class extends Controller {
   static targets = ["scroll", "messages", "jumpButton", "loadOlder", "hint"]
-  static values  = { olderUrl: String, sinceUrl: String }
+  static values  = { olderUrl: String, newerUrl: String }
 
   connect() {
     this.atBottom          = true
@@ -93,7 +93,7 @@ export default class extends Controller {
     const prevScrollHeight = this.scrollTarget.scrollHeight
     const prevScrollTop    = this.scrollTarget.scrollTop
 
-    const url      = new URL(this.olderUrlValue, location.href)
+    const url = new URL(this.olderUrlValue, location.href)
     url.searchParams.set("before_id", beforeId)
 
     const response = await fetch(url, {
@@ -121,7 +121,7 @@ export default class extends Controller {
 
     this.polling = true
 
-    const url = new URL(this.sinceUrlValue, location.href)
+    const url = new URL(this.newerUrlValue, location.href)
     url.searchParams.set("after_id", afterId)
 
     const response = await fetch(url, { headers: { Accept: "text/vnd.turbo-stream.html" } })
