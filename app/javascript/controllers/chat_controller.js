@@ -70,13 +70,34 @@ export default class extends Controller {
     const stream = event.detail.newStream
     if (stream.action !== "append" && stream.action !== "prepend") return
     if (stream.target !== this.messagesTarget.id) return
-    const firstChild = stream.templateContent?.firstElementChild
-    if (firstChild?.id && document.getElementById(firstChild.id)) {
+
+    const el = stream.templateContent?.firstElementChild
+    if (!el?.id) return
+
+    if (document.getElementById(el.id)) {
       event.detail.render = () => {}
+      return
+    }
+
+    if (stream.action === "append") {
+      const incomingId = this.#parseId(el.id)
+      const lastId = this.latestMessageId
+      if (incomingId && lastId && incomingId < lastId) {
+        event.detail.render = () => {
+          const messages = [...this.messagesTarget.children].filter(m => !m.dataset.dateSeparator && m.id)
+          const anchor = messages.find(m => this.#parseId(m.id) > incomingId)
+          anchor ? anchor.before(el) : this.messagesTarget.append(el)
+        }
+      }
     }
   }
 
   // private
+
+  #parseId(id) {
+    const match = id?.match(/\d+$/)
+    return match ? parseInt(match[0]) : null
+  }
 
   maybeLoadOlder() {
     if (!this.hasMore || this.loadingOlder) return
@@ -135,16 +156,12 @@ export default class extends Controller {
 
   get latestMessageId() {
     const last = [...this.messagesTarget.children].findLast(el => !el.dataset.dateSeparator)
-    if (!last) return null
-    const match = last.id.match(/\d+$/)
-    return match ? parseInt(match[0]) : null
+    return this.#parseId(last?.id)
   }
 
   get oldestMessageId() {
     const first = [...this.messagesTarget.children].find(el => !el.dataset.dateSeparator)
-    if (!first) return null
-    const match = first.id.match(/\d+$/)
-    return match ? parseInt(match[0]) : null
+    return this.#parseId(first?.id)
   }
 
   insertDateSeparators() {
@@ -212,11 +229,10 @@ export default class extends Controller {
 
   trimOldMessages() {
     const messages = [...this.messagesTarget.children].filter(el => !el.dataset.dateSeparator)
-    while (messages.length > 100) {
-      const oldest = messages.shift()
-      const prev = oldest.previousElementSibling
+    for (let i = 0; i < messages.length - 100; i++) {
+      const prev = messages[i].previousElementSibling
       if (prev?.dataset.dateSeparator) prev.remove()
-      oldest.remove()
+      messages[i].remove()
     }
   }
 }
