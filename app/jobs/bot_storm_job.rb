@@ -49,9 +49,10 @@ class BotStormJob < ApplicationJob
     "**error:** too many vibes\n`stack trace: vibes.rb:42`",
     <<~MSG,
       ```
-      /\\_/\\
+       /\\_/\\
       ( o.o )
        > ^ <
+      M E O W
       ```
     MSG
     "I'm not a robot\n\n~~I'm not a robot~~\n\n**I am a robot**",

@@ -1,7 +1,7 @@
 class MessagesController < ApplicationController
   rescue_from ActionController::InvalidAuthenticityToken, with: :handle_csrf_error
 
-  before_action :set_message, only: %i[ show edit update destroy ]
+  before_action :set_message, only: %i[ update destroy ]
 
   # GET /messages or /messages.json
   def index
@@ -32,66 +32,31 @@ class MessagesController < ApplicationController
     }
   end
 
-  # GET /messages/1 or /messages/1.json
-  def show
-  end
-
-  # GET /messages/new
-  def new
-    @message = Message.new
-  end
-
-  # GET /messages/1/edit
-  def edit
-  end
-
-  # POST /messages or /messages.json
+  # POST /messages
   def create
     @message = Message.new(message_params)
     @message.author = current_username
 
-    respond_to do |format|
-      if @message.save
-        format.turbo_stream do
-          render turbo_stream: [
-            turbo_stream.append("messages", partial: "message", locals: { message: @message }),
-            turbo_stream.update("message_form", partial: "form", locals: { message: Message.new })
-          ]
-        end
-        format.html { redirect_to messages_path }
-        format.json { render :show, status: :created, location: @message }
-      else
-        format.turbo_stream { render turbo_stream: turbo_stream.update("message_form", partial: "form", locals: { message: @message }) }
-        format.html { render :new, status: :unprocessable_entity }
-        format.json { render json: @message.errors, status: :unprocessable_entity }
-      end
+    if @message.save
+      render turbo_stream: [
+        turbo_stream.append("messages", partial: "message", locals: { message: @message }),
+        turbo_stream.update("message_form", partial: "form", locals: { message: Message.new })
+      ]
+    else
+      render turbo_stream: turbo_stream.update("message_form", partial: "form", locals: { message: @message })
     end
   end
 
-  # PATCH/PUT /messages/1 or /messages/1.json
+  # PATCH/PUT /messages/1
   def update
-    respond_to do |format|
-      if @message.update(message_params)
-        format.turbo_stream { render turbo_stream: turbo_stream.replace(@message, partial: "message", locals: { message: @message, current_user: current_username }) }
-        format.html { redirect_to messages_path }
-        format.json { render :show, status: :ok, location: @message }
-      else
-        format.turbo_stream { render turbo_stream: turbo_stream.replace(@message, partial: "message", locals: { message: @message, current_user: current_username }) }
-        format.html { render :edit, status: :unprocessable_entity }
-        format.json { render json: @message.errors, status: :unprocessable_entity }
-      end
-    end
+    @message.update(message_params)
+    render turbo_stream: turbo_stream.replace(@message, partial: "message", locals: { message: @message, current_user: current_username })
   end
 
-  # DELETE /messages/1 or /messages/1.json
+  # DELETE /messages/1
   def destroy
     @message.destroy!
-
-    respond_to do |format|
-      format.turbo_stream { render turbo_stream: turbo_stream.remove(@message) }
-      format.html { redirect_to messages_path }
-      format.json { head :no_content }
-    end
+    render turbo_stream: turbo_stream.remove(@message)
   end
 
   private
