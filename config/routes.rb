@@ -2,6 +2,7 @@ Rails.application.routes.draw do
   resources :messages do
     collection do
       get :older
+      get :since
     end
   end
   resource :session, only: [:destroy]

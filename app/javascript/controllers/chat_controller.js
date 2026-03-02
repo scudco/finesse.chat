@@ -1,8 +1,8 @@
 import { Controller } from "@hotwired/stimulus"
 
 export default class extends Controller {
-  static targets = ["scroll", "messages", "jumpButton", "loadOlder"]
-  static values  = { currentUser: String, olderUrl: String }
+  static targets = ["scroll", "messages", "jumpButton", "loadOlder", "hint"]
+  static values  = { olderUrl: String, sinceUrl: String }
 
   connect() {
     this.atBottom          = true
@@ -11,6 +11,10 @@ export default class extends Controller {
     this.scrollingToBottom = false
     this.scrollTarget.scrollTop = this.scrollTarget.scrollHeight
     requestAnimationFrame(() => this.scrollTarget.classList.remove("opacity-0"))
+    this.polling = false
+    this.pollInterval = setInterval(() => this.pollForMessages(), 20_000)
+    this.handleVisibilityChange = () => { if (document.visibilityState === "visible") this.pollForMessages() }
+    document.addEventListener("visibilitychange", this.handleVisibilityChange)
     this.observer = new MutationObserver(() => {
       if (this.atBottom || this.scrollingToBottom) {
         this.trimOldMessages()
@@ -22,10 +26,15 @@ export default class extends Controller {
     })
     this.observer.observe(this.scrollTarget, { childList: true, subtree: true })
     this.insertDateSeparators()
+    this.handleBeforeStreamRender = this.deduplicateAppend.bind(this)
+    document.addEventListener("turbo:before-stream-render", this.handleBeforeStreamRender)
   }
 
   disconnect() {
+    clearInterval(this.pollInterval)
+    document.removeEventListener("visibilitychange", this.handleVisibilityChange)
     this.observer.disconnect()
+    document.removeEventListener("turbo:before-stream-render", this.handleBeforeStreamRender)
   }
 
   // Wired via data-action="scroll->chat#onScroll" on the scroll target.
@@ -45,10 +54,25 @@ export default class extends Controller {
     this.hideJumpButton()
   }
 
+  hintTargetConnected(el) {
+    const isMac = /Mac|iPhone|iPad|iPod/.test(navigator.platform)
+    el.textContent = (isMac ? "⌘" : "Ctrl") + "+Enter to send"
+  }
+
   submitOnEnter(event) {
-    if (event.key === "Enter" && !event.shiftKey) {
+    if (event.key === "Enter" && (event.metaKey || event.ctrlKey)) {
       event.preventDefault()
       event.target.closest("form").requestSubmit()
+    }
+  }
+
+  deduplicateAppend(event) {
+    const stream = event.detail.newStream
+    if (stream.action !== "append" && stream.action !== "prepend") return
+    if (stream.target !== this.messagesTarget.id) return
+    const firstChild = stream.templateContent?.firstElementChild
+    if (firstChild?.id && document.getElementById(firstChild.id)) {
+      event.detail.render = () => {}
     }
   }
 
@@ -88,6 +112,32 @@ export default class extends Controller {
 
     this.loadOlderTarget.classList.add("hidden")
     this.loadingOlder = false
+  }
+
+  async pollForMessages() {
+    if (this.polling) return
+    const afterId = this.latestMessageId
+    if (!afterId) return
+
+    this.polling = true
+
+    const url = new URL(this.sinceUrlValue, location.href)
+    url.searchParams.set("after_id", afterId)
+
+    const response = await fetch(url, { headers: { Accept: "text/vnd.turbo-stream.html" } })
+    if (response.ok) {
+      const html = await response.text()
+      if (html.trim()) await Turbo.renderStreamMessage(html)
+    }
+
+    this.polling = false
+  }
+
+  get latestMessageId() {
+    const last = [...this.messagesTarget.children].findLast(el => !el.dataset.dateSeparator)
+    if (!last) return null
+    const match = last.id.match(/\d+$/)
+    return match ? parseInt(match[0]) : null
   }
 
   get oldestMessageId() {
