@@ -38,6 +38,13 @@ export default class extends Controller {
     this.hideJumpButton()
   }
 
+  submitOnEnter(event) {
+    if (event.key === "Enter" && !event.shiftKey) {
+      event.preventDefault()
+      event.target.closest("form").requestSubmit()
+    }
+  }
+
   // private
 
   maybeLoadOlder() {
