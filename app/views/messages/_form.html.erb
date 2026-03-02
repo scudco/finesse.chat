@@ -3,9 +3,6 @@
   <% if message.errors.any? %>
     <p class="text-sm text-red-500 mb-2"><%= message.errors.full_messages.to_sentence %></p>
   <% end %>
-
-  <%= form.hidden_field :author, value: current_username %>
-
   <div class="flex items-stretch gap-2">
     <%= form.text_area :content,
           placeholder: "Type a message…",
@@ -18,4 +15,5 @@
     <%= form.submit "Send",
           class: "rounded-lg px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white text-sm font-medium cursor-pointer shrink-0" %>
   </div>
+  <p class="hidden sm:block text-xs text-gray-400 mt-1" data-chat-target="hint"></p>
 <% end %>
