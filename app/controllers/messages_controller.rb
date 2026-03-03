@@ -37,18 +37,24 @@ class MessagesController < ApplicationController
 
   # POST /messages
   def create
-    @message = Message.new(message_params)
-    @message.author = current_username
+    content = message_params[:content].to_s
 
-    if @message.save
-      FinesseBotJob.perform_later(@message) if @message.content.start_with?("/")
-      render turbo_stream: [
-        turbo_stream.append("messages", partial: "message", locals: { message: @message }),
-        turbo_stream.update("message_form", partial: "form", locals: { message: Message.new })
-      ]
+    if SlashCommand.match?(content)
+      cmd = SlashCommand.new(content, author: current_username)
+      FinesseBotJob.perform_later(cmd.bot_input) if cmd.bot_input
+      @message = cmd.message
     else
-      render turbo_stream: turbo_stream.update("message_form", partial: "form", locals: { message: @message })
+      @message = Message.new(message_params.merge(author: current_username))
     end
+
+    if @message && !@message.save
+      render turbo_stream: turbo_stream.update("message_form", partial: "form", locals: { message: @message })
+      return
+    end
+
+    streams = [ turbo_stream.update("message_form", partial: "form", locals: { message: Message.new }) ]
+    streams.unshift turbo_stream.append("messages", partial: "message", locals: { message: @message }) if @message
+    render turbo_stream: streams
   end
 
   # PATCH/PUT /messages/1
