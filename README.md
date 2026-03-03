@@ -45,7 +45,11 @@ bin/rails test:system   # system tests (headless Chrome)
 bin/rubocop             # linting
 ```
 
-CI runs all three on every pull request via GitHub Actions.
+CI runs all three on every pull request via GitHub Actions. Run `bin/ci` locally before pushing to catch issues early. To wire it up as a git hook:
+
+```bash
+echo -e '#!/usr/bin/env bash\nset -e\nbin/ci' > .git/hooks/pre-push && chmod +x .git/hooks/pre-push
+```
 
 ## Credits
 
