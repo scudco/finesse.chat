@@ -1,6 +1,6 @@
 class Message < ApplicationRecord
   validates :content, :author, presence: true
-  validates :content, length: { maximum: 2000 }
+  validates :content, length: { maximum: 500 }
 
   after_create_commit  -> { broadcast_append_to "chat" }
   after_update_commit  -> { broadcast_replace_to "chat" }

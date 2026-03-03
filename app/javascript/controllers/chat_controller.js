@@ -69,6 +69,11 @@ export default class extends Controller {
   hintTargetConnected(el) {
     const isMac = /Mac|iPhone|iPad|iPod/.test(navigator.platform)
     el.textContent = (isMac ? "⌘" : "Ctrl") + "+Enter to send"
+    el.classList.add("invisible")
+  }
+
+  onInput(event) {
+    this.hintTarget.classList.toggle("invisible", event.target.value.trim() === "")
   }
 
   submitOnEnter(event) {

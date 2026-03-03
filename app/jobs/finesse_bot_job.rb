@@ -5,9 +5,9 @@ class FinesseBotJob < ApplicationJob
   CAT_FACTS   = File.readlines(Rails.root.join("db/catfacts.txt"), chomp: true).freeze
   ACRONYMS    = CSV.read(Rails.root.join("db/acronyms.tsv"), col_sep: "\t").to_h.freeze
 
-  def perform(input)
+  def perform(input, invoked_by: nil)
     content = dispatch(input.strip)
-    Message.create!(author: BOT_AUTHOR, content: content) if content
+    Message.create!(author: BOT_AUTHOR, content: content, invoked_by:) if content
   end
 
   private

@@ -13,11 +13,11 @@ class MessageTest < ActiveSupport::TestCase
     assert_not Message.new(author: "Alice").valid?
   end
 
-  test "invalid when content exceeds 2000 characters" do
-    assert_not Message.new(author: "Alice", content: "x" * 2001).valid?
+  test "invalid when content exceeds 500 characters" do
+    assert_not Message.new(author: "Alice", content: "x" * 501).valid?
   end
 
-  test "valid at exactly 2000 characters" do
-    assert Message.new(author: "Alice", content: "x" * 2000).valid?
+  test "valid at exactly 500 characters" do
+    assert Message.new(author: "Alice", content: "x" * 500).valid?
   end
 end
