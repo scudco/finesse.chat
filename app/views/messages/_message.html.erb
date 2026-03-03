@@ -38,7 +38,7 @@
         <%= f.text_area :content,
               class: "w-full text-sm text-gray-800 bg-white border border-gray-300 rounded px-2 py-1 resize-none focus:outline-none focus:ring-1 focus:ring-blue-500",
               rows: 3,
-              data: { action: "keydown->message#keydown" } %>
+              data: { action: "keydown->message#keydown", message_target: "textarea" } %>
         <div class="flex gap-3 mt-1 text-xs">
           <button type="submit" class="text-blue-600 hover:text-blue-500 cursor-pointer font-medium">Save</button>
           <button type="button" data-action="click->message#cancelEdit"

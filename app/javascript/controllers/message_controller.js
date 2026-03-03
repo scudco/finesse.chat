@@ -3,7 +3,7 @@ import { Controller } from "@hotwired/stimulus"
 const currentUser = document.querySelector('meta[name="current-user"]')?.content
 
 export default class extends Controller {
-  static targets = ["content", "editor", "actions"]
+  static targets = ["content", "editor", "actions", "textarea"]
   static values  = { author: String }
 
   connect() {
@@ -16,14 +16,12 @@ export default class extends Controller {
   startEdit() {
     this.contentTarget.classList.add("hidden")
     this.editorTarget.classList.remove("hidden")
-    const textarea = this.editorTarget.querySelector("textarea")
-    textarea.focus()
+    this.textareaTarget.focus()
     this.element.scrollIntoView({ block: "nearest" })
   }
 
   cancelEdit() {
-    const textarea = this.editorTarget.querySelector("textarea")
-    textarea.value = textarea.defaultValue
+    this.textareaTarget.value = this.textareaTarget.defaultValue
     this.editorTarget.classList.add("hidden")
     this.contentTarget.classList.remove("hidden")
   }
@@ -32,7 +30,8 @@ export default class extends Controller {
     if (event.key === "Escape") {
       this.cancelEdit()
     } else if ((event.metaKey || event.ctrlKey) && event.key === "Enter") {
-      event.target.closest("form").requestSubmit()
+      event.preventDefault()
+      event.target.closest("form")?.requestSubmit()
     }
   }
 }

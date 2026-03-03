@@ -12,6 +12,9 @@ class MessagesController < ApplicationController
 
   # POST /messages/bot_storm
   def bot_storm
+    if SolidQueue::Job.where(class_name: "BotStormJob", finished_at: nil).exists?
+      head :too_many_requests and return
+    end
     BotStormJob.perform_later
     head :no_content
   end
@@ -38,6 +41,7 @@ class MessagesController < ApplicationController
     @message.author = current_username
 
     if @message.save
+      FinesseBotJob.perform_later(@message) if @message.content.start_with?("/")
       render turbo_stream: [
         turbo_stream.append("messages", partial: "message", locals: { message: @message }),
         turbo_stream.update("message_form", partial: "form", locals: { message: Message.new })

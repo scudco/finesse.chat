@@ -63,7 +63,6 @@ class BotStormJob < ApplicationJob
   def perform(count: 100)
     count.times do
       Message.create!(author: "#{BOTS.sample}#{rand(10..99)}", content: MESSAGES.sample)
-      sleep 0.02
     end
   end
 end

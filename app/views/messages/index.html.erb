@@ -23,7 +23,8 @@
     <div class="flex items-center justify-between">
       <p class="text-xs text-gray-400">Chat resets in <span data-controller="countdown"></span></p>
       <%= button_to "⚡ Bot Storm", bot_storm_messages_path,
-            class: "rounded-lg px-3 py-1.5 bg-red-500 hover:bg-red-400 text-white text-xs font-medium cursor-pointer" %>
+            class: "rounded-lg px-3 py-1.5 bg-red-500 hover:bg-red-400 text-white text-xs font-medium cursor-pointer",
+            data: { turbo_submits_with: "⚡ Bot Storm" } %>
     </div>
   </div>
 
