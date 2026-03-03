@@ -1,7 +1,7 @@
 import { Controller } from "@hotwired/stimulus"
 
 export default class extends Controller {
-  static targets = ["scroll", "messages", "jumpButton", "loadOlder", "hint"]
+  static targets = ["scroll", "messages", "jumpButton", "loadOlder", "hint", "input"]
   static values  = { olderUrl: String, newerUrl: String }
 
   connect() {
@@ -52,6 +52,10 @@ export default class extends Controller {
   jumpToPresent() {
     this.scrollToBottom("smooth")
     this.hideJumpButton()
+  }
+
+  inputTargetConnected(el) {
+    el.focus()
   }
 
   hintTargetConnected(el) {
