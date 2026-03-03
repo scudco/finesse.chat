@@ -14,10 +14,19 @@ class ApplicationController < ActionController::Base
 
   private
 
-  ADJECTIVES = %w[Red Blue Green Bold Calm Cool Deft Fast Gold Jade Kind Neat Rash Sage Wild].freeze
-  ANIMALS    = %w[Fox Owl Bear Wolf Lynx Crow Deer Mink Hare Pike Puma Wren Vole Newt Ibis].freeze
+  WORDS = File.readlines(Rails.root.join("db/wordlist.txt"), chomp: true).freeze
 
+  # Derive a username deterministically from the session ID so that the same
+  # session always produces the same name and collisions are as unlikely as
+  # two sessions sharing a cryptographic ID.
+  # 1,633 words × 1,633 words = ~2.6M combinations; 50% collision at ~2,300 users.
   def set_username
-    session[:username] ||= "#{ADJECTIVES.sample}#{ANIMALS.sample}#{rand(10..99)}"
+    session[:username] ||= begin
+      hash   = Digest::SHA256.hexdigest(request.session.id.to_s).to_i(16)
+      [
+        WORDS[hash % WORDS.length].capitalize,
+        WORDS[(hash / WORDS.length) % WORDS.length].capitalize
+      ].join
+    end
   end
 end

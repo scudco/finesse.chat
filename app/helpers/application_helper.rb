@@ -27,7 +27,7 @@ module ApplicationHelper
   ).freeze
 
   ALLOWED_TAGS  = %w[strong em del br p ul ol li a code pre blockquote].freeze
-  ALLOWED_ATTRS = { "a" => %w[href target rel] }.freeze
+  ALLOWED_ATTRS = %w[href target rel].freeze
 
   def render_chat_markdown(text)
     raw_html = MARKDOWN.render(text.to_s)

@@ -46,3 +46,7 @@ bin/rubocop             # linting
 ```
 
 CI runs all three on every pull request via GitHub Actions.
+
+## Credits
+
+- `db/wordlist.txt` — [Oren Tirosh's mnemonic encoding wordlist](https://web.archive.org/web/20101031205747/http://www.tothink.com/mnemonic/), via [singpolyma/mnemonicode](https://github.com/singpolyma/mnemonicode)
