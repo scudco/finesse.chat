@@ -1,5 +1,7 @@
 import { Controller } from "@hotwired/stimulus"
 
+const currentUser = document.querySelector('meta[name="current-user"]')?.content
+
 export default class extends Controller {
   static targets = ["scroll", "messages", "jumpButton", "loadOlder", "hint", "input"]
   static values  = { olderUrl: String, newerUrl: String }
@@ -67,7 +69,17 @@ export default class extends Controller {
     if (event.key === "Enter" && (event.metaKey || event.ctrlKey)) {
       event.preventDefault()
       event.target.closest("form").requestSubmit()
+    } else if (event.key === "ArrowUp" && event.target.value === "") {
+      event.preventDefault()
+      this.editLastOwnMessage()
     }
+  }
+
+  editLastOwnMessage() {
+    const last = [...this.messagesTarget.querySelectorAll("[data-message-author-value]")]
+      .findLast(el => el.dataset.messageAuthorValue === currentUser)
+    if (!last) return
+    this.application.getControllerForElementAndIdentifier(last, "message")?.startEdit()
   }
 
   deduplicateAppend(event) {
