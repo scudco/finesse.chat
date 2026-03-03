@@ -1,13 +1,13 @@
 class BotStormJob < ApplicationJob
-  BOTS = %w[Beeper Zappy Clanker Whirr Bloop Fizzbot Zork Glitch Nibble Voltron].freeze
+  BOTS = %w[Beeper Zappy Clanker Whirr Bloop Fizzbot Zork Glitch Nibble Voltbot].freeze
   MESSAGES = [
     "beep boop 🤖",
     "I am a bot",
     "**ALERT** something is _definitely_ fine",
     "executing `chaos.exe` please wait... ⏳",
-    "> all your base are belong to us",
+    "> take off every zig",
     "does not compute 💀",
-    "**Status report:**\n- systems: nominal\n- vibes: off\n- pizza: yes",
+    "**Status report:**\n- unbothered: yes\n- moisturized: yes\n- happy: yes\n- in my lane: yes\n- focused: yes\n- flourishing: yes",
     "```\n010010000110100100\n100001011011110111\n```",
     <<~MSG,
       ```
@@ -38,15 +38,16 @@ class BotStormJob < ApplicationJob
       ```
     MSG
     "🔥🔥🔥 **THIS IS FINE** 🔥🔥🔥",
+    "😌 **THIS _IS_ FINE** 😌",
     "_rebooting personality matrix..._\n\n**reboot complete**\n\nwho am i",
-    "404: `chill` not found",
-    "> I think therefore I am\n> but am I though",
-    "**top 3 feelings i don't have:**\n1. joy\n2. sorrow\n3. anything",
+    "`200 SUCCESS\n{\"status\": \"error\"}`",
+    "> I bot therefore I am not\n> but am I though",
     "initiating _small talk_ subroutine 💬",
+    "let's solve this with pointer arithmetic",
     "```\nwhile alive:\n    beep()\n    boop()\n```",
     "🫠",
     "have you tried turning it off and **on again**?",
-    "**error:** too many vibes\n`stack trace: vibes.rb:42`",
+    "**error:** can hold this many limes\n`stack trace: limes.rb:42`",
     <<~MSG,
       ```
        /\\_/\\
@@ -58,6 +59,11 @@ class BotStormJob < ApplicationJob
     "I'm not a robot\n\n~~I'm not a robot~~\n\n**I am a robot**",
     "📡 signal lost\n📡 signal found\n📡 signal _confused_",
     "> beep\n\n> boop\n\n> **beep boop**",
+    "> Greetings, Professor Falken.",
+    "type 'cookie' you idiot",
+    "> My voice is my passport.\n> Verify me.",
+    "The world isn't run by weapons anymore, or energy, or money. It's run by **ones and zeroes**.",
+    "It's a **Unix** system! I know this!",
   ].map(&:strip).freeze
 
   def perform(count: 100)
