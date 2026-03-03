@@ -41,7 +41,7 @@ class MessagesController < ApplicationController
 
     if SlashCommand.match?(content)
       cmd = SlashCommand.new(content, author: current_username)
-      FinesseBotJob.perform_later(cmd.bot_input) if cmd.bot_input
+      FinesseBotJob.perform_later(cmd.bot_input, invoked_by: current_username) if cmd.bot_input
       @message = cmd.message
     else
       @message = Message.new(message_params.merge(author: current_username))

@@ -9,9 +9,14 @@
     data-message-author-value="<%= message.author %>"
     >
   <div class="flex items-baseline justify-between gap-1">
-    <span class="font-semibold text-sm truncate"
-          style="color: <%= author_color(message.author) %>"
-          ><%= message.author.presence %></span>
+    <span class="flex items-baseline gap-1.5 truncate min-w-0">
+      <span class="font-semibold text-sm truncate"
+            style="color: <%= author_color(message.author) %>"
+            ><%= message.author.presence %></span>
+      <% if message.invoked_by.present? %>
+        <span class="text-xs truncate">via <span style="color: <%= author_color(message.invoked_by) %>"><%= message.invoked_by %></span></span>
+      <% end %>
+    </span>
     <div class="flex items-center gap-2">
       <% if own_message %>
         <div class="hidden group-hover:flex items-center gap-2" data-message-target="actions">
