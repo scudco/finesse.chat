@@ -63,7 +63,7 @@ class BotStormJob < ApplicationJob
     "type 'cookie' you idiot",
     "> My voice is my passport.\n> Verify me.",
     "The world isn't run by weapons anymore, or energy, or money. It's run by **ones and zeroes**.",
-    "It's a **Unix** system! I know this!",
+    "It's a **Unix** system! I know this!"
   ].map(&:strip).freeze
 
   def perform(count: 100)
