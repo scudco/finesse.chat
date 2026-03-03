@@ -43,7 +43,7 @@ class FinesseBotJob < ApplicationJob
   end
 
   def wtf(acronym)
-    key = acronym.strip.upcase
+    key = acronym.to_s.strip.upcase
 
     return "`/wtf` needs an acronym — e.g. `/wtf API`" if acronym.blank?
     return "no definition found for `#{acronym.strip}` 🤷" unless ACRONYMS.key?(key)
