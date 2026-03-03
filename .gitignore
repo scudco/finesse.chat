@@ -39,5 +39,3 @@
 
 # Go build artifacts
 /bin/sse-server
-
-.DS_Store
