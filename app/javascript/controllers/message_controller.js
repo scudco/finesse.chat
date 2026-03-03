@@ -16,7 +16,9 @@ export default class extends Controller {
   startEdit() {
     this.contentTarget.classList.add("hidden")
     this.editorTarget.classList.remove("hidden")
-    this.textareaTarget.focus()
+    const ta = this.textareaTarget
+    ta.focus()
+    ta.setSelectionRange(ta.value.length, ta.value.length)
     this.element.scrollIntoView({ block: "nearest" })
   }
 
@@ -24,6 +26,11 @@ export default class extends Controller {
     this.textareaTarget.value = this.textareaTarget.defaultValue
     this.editorTarget.classList.add("hidden")
     this.contentTarget.classList.remove("hidden")
+    this.#focusChatInput()
+  }
+
+  submitted() {
+    this.#focusChatInput()
   }
 
   keydown(event) {
@@ -33,5 +40,11 @@ export default class extends Controller {
       event.preventDefault()
       event.target.closest("form")?.requestSubmit()
     }
+  }
+
+  // private
+
+  #focusChatInput() {
+    document.querySelector('[data-chat-target="input"]')?.focus()
   }
 }
