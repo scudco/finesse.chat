@@ -5,44 +5,61 @@ class MessagesControllerTest < ActionDispatch::IntegrationTest
     @message = messages(:one)
   end
 
-  test "should get index" do
+  test "index renders successfully" do
     get messages_url
     assert_response :success
   end
 
-  test "should get new" do
-    get new_message_url
-    assert_response :success
-  end
-
-  test "should create message" do
-    assert_difference("Message.count") do
-      post messages_url, params: { message: { author: @message.author, content: @message.content } }
+  test "create saves message and returns turbo stream" do
+    assert_difference "Message.count" do
+      post messages_url,
+        params: { message: { content: "hello" } },
+        headers: { "Accept" => "text/vnd.turbo-stream.html" }
     end
-
-    assert_redirected_to message_url(Message.last)
-  end
-
-  test "should show message" do
-    get message_url(@message)
     assert_response :success
   end
 
-  test "should get edit" do
-    get edit_message_url(@message)
-    assert_response :success
-  end
-
-  test "should update message" do
-    patch message_url(@message), params: { message: { author: @message.author, content: @message.content } }
-    assert_redirected_to message_url(@message)
-  end
-
-  test "should destroy message" do
-    assert_difference("Message.count", -1) do
-      delete message_url(@message)
+  test "create with blank content does not save" do
+    assert_no_difference "Message.count" do
+      post messages_url,
+        params: { message: { content: "" } },
+        headers: { "Accept" => "text/vnd.turbo-stream.html" }
     end
+    assert_response :success
+  end
 
-    assert_redirected_to messages_url
+  test "create with slash command does not save user message" do
+    assert_no_difference "Message.count" do
+      post messages_url,
+        params: { message: { content: "/time" } },
+        headers: { "Accept" => "text/vnd.turbo-stream.html" }
+    end
+    assert_response :success
+  end
+
+  test "update replaces message content" do
+    post messages_url,
+      params: { message: { content: "original" } },
+      headers: { "Accept" => "text/vnd.turbo-stream.html" }
+    message = Message.last
+
+    patch message_url(message),
+      params: { message: { content: "updated" } },
+      headers: { "Accept" => "text/vnd.turbo-stream.html" }
+    assert_response :success
+    assert_equal "updated", message.reload.content
+  end
+
+  test "destroy removes message" do
+    post messages_url,
+      params: { message: { content: "to be deleted" } },
+      headers: { "Accept" => "text/vnd.turbo-stream.html" }
+    message = Message.last
+
+    assert_difference "Message.count", -1 do
+      delete message_url(message),
+        headers: { "Accept" => "text/vnd.turbo-stream.html" }
+    end
+    assert_response :success
   end
 end
