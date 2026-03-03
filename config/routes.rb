@@ -6,7 +6,7 @@ Rails.application.routes.draw do
       post :bot_storm
     end
   end
-  resource :session, only: [:destroy]
+  resource :session, only: [ :destroy ]
 
   get "up" => "rails/health#show", as: :rails_health_check
 
@@ -14,5 +14,5 @@ Rails.application.routes.draw do
 
   # Silence Chrome DevTools well-known probe.
   get "/.well-known/appspecific/com.chrome.devtools.json",
-      to: proc { [204, {}, []] }
+      to: proc { [ 204, {}, [] ] }
 end
