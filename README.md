@@ -4,7 +4,7 @@ A real-time group chat demo built with Rails 8. The focus is on exploring modern
 
 ---
 
-![Screenshot](docs/screenshot.png)
+![Screenshot](docs/screenshot.webp)
 
 ---
 
@@ -26,6 +26,7 @@ A real-time group chat demo built with Rails 8. The focus is on exploring modern
 - **Dark/light/system theme** with localStorage persistence and an anti-flash inline script in `<head>`
 - **Automatic chat clearing** every 5 minutes via SolidQueue recurring job, broadcasting the empty state to all connected clients
 - **iOS Safari bfcache** handled via the `pageshow` + `persisted` event to prevent stale message views
+- **Bot Storm** enqueues a SolidQueue job that creates 100 messages in rapid succession — useful for stress-testing transport throughput, verifying scroll behaviour under load, and observing how each transport (WS, SSE, polling) handles a burst of events. Rate-limited to one active storm at a time.
 
 ## Development
 
