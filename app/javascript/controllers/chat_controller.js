@@ -182,12 +182,12 @@ export default class extends Controller {
   }
 
   get latestMessageId() {
-    const last = [...this.messagesTarget.children].findLast(el => !el.dataset.dateSeparator)
+    const last = [...this.messagesTarget.children].findLast(el => !el.dataset.dateSeparator && el.id)
     return this.#parseId(last?.id)
   }
 
   get oldestMessageId() {
-    const first = [...this.messagesTarget.children].find(el => !el.dataset.dateSeparator)
+    const first = [...this.messagesTarget.children].find(el => !el.dataset.dateSeparator && el.id)
     return this.#parseId(first?.id)
   }
 
