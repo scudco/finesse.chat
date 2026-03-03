@@ -2,6 +2,12 @@ import { Controller } from "@hotwired/stimulus"
 
 const currentUser = document.querySelector('meta[name="current-user"]')?.content
 
+// Reload when iOS Safari restores the page from bfcache — stale messages
+// can't be patched by polling alone since pollForMessages only appends newer.
+window.addEventListener('pageshow', (event) => {
+  if (event.persisted) window.location.reload()
+})
+
 export default class extends Controller {
   static targets = ["scroll", "messages", "jumpButton", "loadOlder", "hint", "input"]
   static values  = { olderUrl: String, newerUrl: String }
