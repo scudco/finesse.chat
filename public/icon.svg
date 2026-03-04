@@ -1,3 +1,8 @@
 <svg width="512" height="512" xmlns="http://www.w3.org/2000/svg">
-  <circle cx="256" cy="256" r="256" fill="red"/>
+  <!-- Chat bubble -->
+  <rect x="32" y="32" width="448" height="360" rx="64" ry="64" fill="#0d9488"/>
+  <!-- Tail -->
+  <polygon points="96,392 32,480 196,392" fill="#0d9488"/>
+  <!-- Lightning bolt -->
+  <polygon points="296,80 200,272 272,272 216,432 368,208 288,208 344,80" fill="#fbbf24"/>
 </svg>

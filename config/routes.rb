@@ -9,6 +9,7 @@ Rails.application.routes.draw do
   resource :session, only: [ :destroy ]
 
   get "up" => "rails/health#show", as: :rails_health_check
+  get "manifest" => "rails/pwa#manifest", as: :pwa_manifest
 
   root "messages#index"
 
