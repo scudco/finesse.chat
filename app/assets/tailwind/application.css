@@ -6,3 +6,12 @@
   --font-sans: 'Inter', sans-serif;
   --font-mono: 'JetBrains Mono', monospace;
 }
+
+turbo-frame {
+  display: contents;
+}
+
+@keyframes poll-countdown {
+  from { stroke-dashoffset: 0; }
+  to   { stroke-dashoffset: 50.27; }
+}
