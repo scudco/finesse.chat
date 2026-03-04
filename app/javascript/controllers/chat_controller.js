@@ -30,7 +30,8 @@ export default class extends Controller {
       } else {
         this.showJumpButton()
       }
-      this.insertDateSeparators()
+      clearTimeout(this.dateSepTimeout)
+      this.dateSepTimeout = setTimeout(() => this.insertDateSeparators(), 50)
     })
     this.observer.observe(this.scrollTarget, { childList: true, subtree: true })
     this.insertDateSeparators()
@@ -40,6 +41,8 @@ export default class extends Controller {
 
   disconnect() {
     clearTimeout(this.pollTimeout)
+    clearTimeout(this.loadOlderTimeout)
+    clearTimeout(this.dateSepTimeout)
     document.removeEventListener("visibilitychange", this.handleVisibilityChange)
     this.observer.disconnect()
     document.removeEventListener("turbo:before-stream-render", this.handleBeforeStreamRender)
@@ -128,7 +131,13 @@ export default class extends Controller {
 
   maybeLoadOlder() {
     if (!this.hasMore || this.loadingOlder) return
-    if (this.scrollTarget.scrollTop < 200) this.loadOlderMessages()
+    if (this.scrollTarget.scrollTop < 200) {
+      clearTimeout(this.loadOlderTimeout)
+      this.loadOlderTimeout = setTimeout(() => {
+        if (!this.hasMore || this.loadingOlder) return
+        this.loadOlderMessages()
+      }, 50)
+    }
   }
 
   async loadOlderMessages() {
@@ -154,6 +163,7 @@ export default class extends Controller {
         this.hasMore = false
       } else {
         await Turbo.renderStreamMessage(html)
+        await new Promise(r => requestAnimationFrame(r))
         this.scrollTarget.scrollTop = prevScrollTop + (this.scrollTarget.scrollHeight - prevScrollHeight)
       }
     }

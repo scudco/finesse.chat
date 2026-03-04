@@ -22,13 +22,13 @@ class MessagesController < ApplicationController
   # GET /messages/older?before_id=N  (turbo stream)
   def older
     messages = Message.where(id: ...params[:before_id].to_i).order(id: :desc).limit(50).reverse
-    render turbo_stream: turbo_stream.prepend("messages", partial: "message", collection: messages)
+    render turbo_stream: messages.reverse.map { |message| turbo_stream.prepend("messages", partial: "message", locals: { message: }) }
   end
 
   # GET /messages/newer?after_id=N  (turbo stream, polling fallback)
   def newer
     messages = Message.where(id: (params[:after_id].to_i + 1)..).order(id: :desc).limit(50).reverse
-    render turbo_stream: turbo_stream.append("messages", partial: "message", collection: messages)
+    render turbo_stream: messages.map { |message| turbo_stream.append("messages", partial: "message", locals: { message: }) }
   end
 
   # POST /messages
