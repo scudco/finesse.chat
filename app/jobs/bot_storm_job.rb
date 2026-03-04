@@ -60,7 +60,7 @@ class BotStormJob < ApplicationJob
     "📡 signal lost\n📡 signal found\n📡 signal _confused_",
     "> beep\n\n> boop\n\n> **beep boop**",
     "> Greetings, Professor Falken.",
-    "type 'cookie' you idiot",
+    "type 'cookie', you idiot",
     "> My voice is my passport.\n> Verify me.",
     "The world isn't run by burgers anymore, or tacos, or ice cream. It's run by **ones and zeroes**.",
     "It's a **Unix** system! I know this!"

@@ -3,6 +3,7 @@ require "csv"
 class FinesseBotJob < ApplicationJob
   BOT_AUTHOR  = "FinesseBot"
   CAT_FACTS   = File.readlines(Rails.root.join("db/catfacts.txt"), chomp: true).freeze
+  DOG_FACTS   = File.readlines(Rails.root.join("db/dogfacts.txt"), chomp: true).freeze
   ACRONYMS    = CSV.read(Rails.root.join("db/acronyms.tsv"), col_sep: "\t").to_h.freeze
 
   def perform(input, invoked_by: nil)
@@ -15,9 +16,11 @@ class FinesseBotJob < ApplicationJob
   def dispatch(input)
     command, arg = input.split(" ", 2)
     case command.downcase
+    when "/help"        then help
     when "/time"        then time
+    when "/woof", "/🐶" then dog_fact
     when "/meow", "/🐱" then cat_fact
-    when "/wtf"         then wtf(arg)
+    when "/wut"         then wut(arg)
     else                     unknown(command)
     end
   end
@@ -27,25 +30,33 @@ class FinesseBotJob < ApplicationJob
   end
 
   def unknown(command)
-    <<~MSG
-    Unknown command: `#{command}`
+    "Unknown command: `#{command}`\n\n#{help}"
+  end
 
+  def help
+    <<~MSG
     Available commands:
+
     - `/time`
     - `/meow`
-    - `/wtf <acronym>`
+    - `/woof`
+    - `/wut <acronym>`
     - `/me <action>`
     MSG
+  end
+
+  def dog_fact
+    "🐶 #{DOG_FACTS.sample}"
   end
 
   def cat_fact
     "🐱 #{CAT_FACTS.sample}"
   end
 
-  def wtf(acronym)
+  def wut(acronym)
     key = acronym.to_s.strip.upcase
 
-    return "`/wtf` needs an acronym — e.g. `/wtf API`" if acronym.blank?
+    return "`/wut` needs an acronym — e.g. `/wut API`" if acronym.blank?
     return "no definition found for `#{acronym.strip}` 🤷" unless ACRONYMS.key?(key)
 
     "**#{key}** — #{ACRONYMS[key]}"

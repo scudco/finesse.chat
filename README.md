@@ -21,7 +21,7 @@ A real-time group chat demo built with Rails 8. The focus is on exploring modern
 - **Three real-time transports**, switchable at runtime: WebSocket (Action Cable via SolidCable), Server-Sent Events (custom Go server polling SQLite at 10ms), and long-poll fallback
 - **SolidQueue** powers background jobs and a recurring clear schedule — no Redis, no Sidekiq
 - **Markdown rendering** via Redcarpet with a custom renderer — fenced code blocks, inline formatting, blockquotes, and safe link handling
-- **Slash commands** (`/time`, `/meow`, `/wtf <acronym>`, `/me`) handled asynchronously by a bot job; commands never echo the user's input
+- **Slash commands** (`/time`, `/meow`, `/woof`, `/wut <acronym>`, `/me`) handled asynchronously by a bot job; commands never echo the user's input
 - **Inline message editing and deletion** scoped to the current session, with focus and scroll management handled in Stimulus
 - **Dark/light/system theme** with localStorage persistence and an anti-flash inline script in `<head>`
 - **Automatic chat clearing** every 5 minutes via SolidQueue recurring job, broadcasting the empty state to all connected clients
@@ -54,3 +54,6 @@ echo -e '#!/usr/bin/env bash\nset -e\nbin/ci' > .git/hooks/pre-push && chmod +x 
 ## Credits
 
 - `db/wordlist.txt` — [Oren Tirosh's mnemonic encoding wordlist](https://web.archive.org/web/20101031205747/http://www.tothink.com/mnemonic/), via [singpolyma/mnemonicode](https://github.com/singpolyma/mnemonicode)
+- `db/catfacts.txt` — [catfact.ninja](https://catfact.ninja/)
+- `db/dogfacts.txt` — [Dog API by kinduff](https://dogapi.dog/)
+- `db/acronyms.tsv` — [NetBSD `wtf(6)` acronyms database](https://man.netbsd.org/wtf.6)
