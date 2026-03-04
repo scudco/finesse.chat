@@ -4,7 +4,7 @@
 
 <div
     id="<%= dom_id message %>"
-    class="group flex flex-col px-2 py-1 hover:bg-gray-200 dark:hover:bg-gray-700"
+    class="group flex flex-col px-2 py-1 hover:bg-gray-200 dark:hover:bg-gray-700 group-data-[out-of-order]:bg-amber-50 dark:group-data-[out-of-order]:bg-amber-950 data-[out-of-order]:bg-amber-50 dark:data-[out-of-order]:bg-amber-950 data-[out-of-order]:border-l-4 data-[out-of-order]:border-amber-400"
     data-controller="message"
     data-message-author-value="<%= message.author %>"
     >
@@ -27,6 +27,8 @@
                 class: "text-xs text-gray-400 hover:text-red-500 cursor-pointer" %>
         </div>
       <% end %>
+      <span class="hidden group-data-[out-of-order]:inline text-xs font-bold text-amber-600 dark:text-amber-400 bg-amber-100 dark:bg-amber-900 px-1.5 py-0.5 rounded shrink-0 select-none uppercase tracking-wide">out of order</span>
+      <span class="text-xs text-gray-300 dark:text-gray-600 shrink-0 opacity-0 group-hover:opacity-100 transition-opacity select-none">#<%= message.id %></span>
       <time
           class="text-xs text-gray-400 shrink-0"
           datetime="<%= message.created_at.iso8601 %>"

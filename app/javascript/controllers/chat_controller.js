@@ -31,10 +31,14 @@ export default class extends Controller {
         this.showJumpButton()
       }
       clearTimeout(this.dateSepTimeout)
-      this.dateSepTimeout = setTimeout(() => this.insertDateSeparators(), 50)
+      this.dateSepTimeout = setTimeout(() => {
+        this.insertDateSeparators()
+        this.markOutOfOrderMessages()
+      }, 50)
     })
     this.observer.observe(this.scrollTarget, { childList: true, subtree: true })
     this.insertDateSeparators()
+    this.markOutOfOrderMessages()
     this.handleBeforeStreamRender = this.deduplicateAppend.bind(this)
     document.addEventListener("turbo:before-stream-render", this.handleBeforeStreamRender)
   }
@@ -238,6 +242,20 @@ export default class extends Controller {
     }
 
     this.observer.observe(this.scrollTarget, { childList: true, subtree: true })
+  }
+
+  markOutOfOrderMessages() {
+    const messages = [...this.messagesTarget.children].filter(el => !el.dataset.dateSeparator && el.id)
+    let prevId = null
+    for (const el of messages) {
+      const id = this.#parseId(el.id)
+      if (prevId !== null && id < prevId) {
+        el.dataset.outOfOrder = "true"
+      } else {
+        delete el.dataset.outOfOrder
+      }
+      prevId = id
+    }
   }
 
   buildDateSeparator(dt) {
