@@ -174,21 +174,18 @@ export default class extends Controller {
 
   async pollForMessages() {
     if (this.polling) return
-    const afterId = this.latestMessageId ?? 0
 
-    this.polling = true
-
-    const url = new URL(this.newerUrlValue, location.href)
-    url.searchParams.set("after_id", afterId)
-
-    const response = await fetch(url, { headers: { Accept: "text/vnd.turbo-stream.html" } })
-    if (response.ok) {
-      const html = await response.text()
-      if (html.trim()) await Turbo.renderStreamMessage(html)
+    if (this.atBottom && !this.messagesTarget.querySelector("[data-message-target='editor']:not(.hidden)")) {
+      this.polling = true
+      const response = await fetch(this.newerUrlValue, { headers: { Accept: "text/vnd.turbo-stream.html" } })
+      if (response.ok) {
+        const html = await response.text()
+        if (html.trim()) await Turbo.renderStreamMessage(html)
+      }
+      this.polling = false
+      this.#resetPollRing()
     }
 
-    this.polling = false
-    this.#resetPollRing()
     this.#schedulePoll()
   }
 

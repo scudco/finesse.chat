@@ -25,10 +25,10 @@ class MessagesController < ApplicationController
     render turbo_stream: messages.reverse.map { |message| turbo_stream.prepend("messages", partial: "message", locals: { message: }) }
   end
 
-  # GET /messages/newer?after_id=N  (turbo stream, polling fallback)
+  # GET /messages/newer  (turbo stream, polling fallback — replaces full list)
   def newer
-    messages = Message.where(id: (params[:after_id].to_i + 1)..).order(id: :desc).limit(50).reverse
-    render turbo_stream: messages.map { |message| turbo_stream.append("messages", partial: "message", locals: { message: }) }
+    messages = Message.order(:id).last(50)
+    render turbo_stream: turbo_stream.update("messages", partial: "messages_list", locals: { messages: })
   end
 
   # POST /messages

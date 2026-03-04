@@ -53,8 +53,7 @@
       Loading older messages…
     </div>
     <div id="messages" class="flex flex-col justify-end min-h-full space-y-1" data-chat-target="messages">
-      <%= render "empty_state" %>
-      <%= render @messages, current_user: current_username %>
+      <%= render "messages_list", messages: @messages, current_user: current_username %>
     </div>
     <div data-chat-target="jumpButton" class="sticky bottom-4 flex justify-center hidden">
       <button data-action="click->chat#jumpToPresent"
