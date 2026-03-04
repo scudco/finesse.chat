@@ -37,7 +37,7 @@ class MessagesController < ApplicationController
 
     if SlashCommand.match?(content)
       cmd = SlashCommand.new(content, author: current_username)
-      FinesseBotJob.perform_later(cmd.bot_input, invoked_by: current_username) if cmd.bot_input
+      @bot_message = FinesseBotJob.perform_now(cmd.bot_input, invoked_by: current_username) if cmd.bot_input
       @message = cmd.message
     else
       @message = Message.new(message_params.merge(author: current_username))
@@ -49,6 +49,7 @@ class MessagesController < ApplicationController
     end
 
     streams = [ turbo_stream.update("message_form", partial: "form", locals: { message: Message.new }) ]
+    streams.unshift turbo_stream.append("messages", partial: "message", locals: { message: @bot_message }) if @bot_message
     streams.unshift turbo_stream.append("messages", partial: "message", locals: { message: @message }) if @message
     render turbo_stream: streams
   end
