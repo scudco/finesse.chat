@@ -4,7 +4,7 @@
      data-controller="chat"
      data-chat-older-url-value="<%= older_messages_path %>"
      data-chat-newer-url-value="<%= newer_messages_path %>"
-     data-chat-poll-interval-value="5000">
+     data-chat-poll-interval-value="7777">
   <% if @transport == "sse" %>
     <turbo-stream-source src="<%= sse_stream_url("chat") %>"></turbo-stream-source>
   <% elsif @transport == "ws" %>
@@ -31,7 +31,12 @@
       </div>
     </div>
     <div class="flex items-center justify-between">
-      <p class="text-xs text-gray-400">Chat resets in <span data-controller="countdown"></span></p>
+      <div data-controller="countdown">
+        <p class="text-xs text-gray-400">Chat resets in <span data-countdown-target="label"></span></p>
+        <div class="mt-1 h-px w-48 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
+          <div class="h-full bg-gray-400 dark:bg-gray-500 transition-[width] duration-1000 ease-linear" data-countdown-target="bar"></div>
+        </div>
+      </div>
       <%= button_to bot_storm_messages_path,
             class: "rounded-lg px-3 py-1.5 bg-red-500 hover:bg-red-400 text-white text-xs font-medium cursor-pointer flex items-center gap-1",
             data: { turbo_submits_with: "Bot Storm" } do %>
