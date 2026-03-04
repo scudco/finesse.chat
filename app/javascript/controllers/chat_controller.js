@@ -9,8 +9,8 @@ window.addEventListener('pageshow', (event) => {
 })
 
 export default class extends Controller {
-  static targets = ["scroll", "messages", "jumpButton", "loadOlder", "hint", "input"]
-  static values  = { olderUrl: String, newerUrl: String }
+  static targets = ["scroll", "messages", "jumpButton", "loadOlder", "hint", "input", "pollRing"]
+  static values  = { olderUrl: String, newerUrl: String, pollInterval: { type: Number, default: 20_000 } }
 
   connect() {
     this.atBottom          = true
@@ -20,7 +20,7 @@ export default class extends Controller {
     this.scrollTarget.scrollTop = this.scrollTarget.scrollHeight
     requestAnimationFrame(() => this.scrollTarget.classList.remove("opacity-0"))
     this.polling = false
-    this.pollInterval = setInterval(() => this.pollForMessages(), 20_000)
+    this.#schedulePoll()
     this.handleVisibilityChange = () => { if (document.visibilityState === "visible") this.pollForMessages() }
     document.addEventListener("visibilitychange", this.handleVisibilityChange)
     this.observer = new MutationObserver(() => {
@@ -39,7 +39,7 @@ export default class extends Controller {
   }
 
   disconnect() {
-    clearInterval(this.pollInterval)
+    clearTimeout(this.pollTimeout)
     document.removeEventListener("visibilitychange", this.handleVisibilityChange)
     this.observer.disconnect()
     document.removeEventListener("turbo:before-stream-render", this.handleBeforeStreamRender)
@@ -164,8 +164,7 @@ export default class extends Controller {
 
   async pollForMessages() {
     if (this.polling) return
-    const afterId = this.latestMessageId
-    if (!afterId) return
+    const afterId = this.latestMessageId ?? 0
 
     this.polling = true
 
@@ -179,6 +178,28 @@ export default class extends Controller {
     }
 
     this.polling = false
+    this.#resetPollRing()
+    this.#schedulePoll()
+  }
+
+  #schedulePoll() {
+    clearTimeout(this.pollTimeout)
+    this.pollTimeout = setTimeout(() => this.pollForMessages(), this.pollIntervalValue)
+  }
+
+  pollRingTargetConnected(el) {
+    this.#startPollRing(el)
+  }
+
+  #resetPollRing() {
+    if (!this.hasPollRingTarget) return
+    this.#startPollRing(this.pollRingTarget)
+  }
+
+  #startPollRing(el) {
+    el.style.animation = "none"
+    el.getBoundingClientRect() // force reflow on SVG element
+    el.style.animation = `poll-countdown ${this.pollIntervalValue}ms linear forwards`
   }
 
   get latestMessageId() {

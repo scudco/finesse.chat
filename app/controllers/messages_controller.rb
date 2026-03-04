@@ -27,7 +27,7 @@ class MessagesController < ApplicationController
 
   # GET /messages/newer?after_id=N  (turbo stream, polling fallback)
   def newer
-    messages = Message.where(id: params[:after_id].to_i..).order(id: :asc).limit(50)
+    messages = Message.where(id: (params[:after_id].to_i + 1)..).order(id: :desc).limit(50).reverse
     render turbo_stream: turbo_stream.append("messages", partial: "message", collection: messages)
   end
 
