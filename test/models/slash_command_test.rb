@@ -18,12 +18,12 @@ class SlashCommandTest < ActiveSupport::TestCase
 
   test "me? is false for other commands" do
     assert_not SlashCommand.new("/time", author: "Alice").me?
-    assert_not SlashCommand.new("/wtf API", author: "Alice").me?
+    assert_not SlashCommand.new("/wut API", author: "Alice").me?
   end
 
   test "bot_input returns input for non-/me commands" do
-    cmd = SlashCommand.new("/wtf API", author: "Alice")
-    assert_equal "/wtf API", cmd.bot_input
+    cmd = SlashCommand.new("/wut API", author: "Alice")
+    assert_equal "/wut API", cmd.bot_input
   end
 
   test "bot_input returns nil for /me" do
