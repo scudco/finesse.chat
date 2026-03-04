@@ -7,7 +7,7 @@ class BotStormJob < ApplicationJob
     "executing `chaos.exe` please wait... ⏳",
     "> take off every zig",
     "does not compute 💀",
-    "**Status report:**\n- unbothered: yes\n- moisturized: yes\n- happy: yes\n- in my lane: yes\n- focused: yes\n- flourishing: yes",
+    "**Status report:**\n\n- ✓ unbothered\n- ✓ moisturized\n- ✓ happy\n- ✓ in my lane\n- ✓ focused\n- ✓ flourishing",
     "```\n010010000110100100\n100001011011110111\n```",
     <<~MSG,
       ```
@@ -62,7 +62,7 @@ class BotStormJob < ApplicationJob
     "> Greetings, Professor Falken.",
     "type 'cookie' you idiot",
     "> My voice is my passport.\n> Verify me.",
-    "The world isn't run by weapons anymore, or energy, or money. It's run by **ones and zeroes**.",
+    "The world isn't run by burgers anymore, or tacos, or ice cream. It's run by **ones and zeroes**.",
     "It's a **Unix** system! I know this!"
   ].map(&:strip).freeze
 
