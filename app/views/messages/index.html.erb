@@ -14,22 +14,20 @@
   <div class="shrink-0 pt-4 pb-2 space-y-1.5">
     <div class="flex items-center justify-between">
       <h1 class="text-2xl font-bold">Finesse Chat</h1>
-      <div class="flex items-center gap-2">
-      <% if @transport == "none" %>
-        <svg class="w-5 h-5 -rotate-90 shrink-0" viewBox="0 0 20 20" aria-label="Next poll">
-          <circle cx="10" cy="10" r="8" fill="none" stroke-width="2" class="stroke-gray-200 dark:stroke-gray-700"/>
-          <circle cx="10" cy="10" r="8" fill="none" stroke-width="2"
-                  stroke-dasharray="50.27" stroke-linecap="round"
-                  class="stroke-teal-500"
-                  data-chat-target="pollRing"/>
-        </svg>
-      <% end %>
       <div class="flex text-xs font-medium rounded-lg overflow-hidden border border-gray-200 dark:border-gray-700">
         <% [["none", "Polling"], ["ws", "WS"], ["sse", "SSE"]].each do |value, label| %>
-          <%= link_to label, messages_path(transport: value),
-                class: "px-3 py-1.5 #{@transport == value ? "bg-blue-600 text-white" : "bg-white dark:bg-gray-800 text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700"}" %>
+          <% if @transport == value && value == "none" %>
+            <%= link_to messages_path(transport: value),
+                  class: "px-3 py-1.5 relative overflow-hidden bg-blue-700 text-white" do %>
+              <span class="absolute inset-0 bg-blue-600 origin-left" data-chat-target="pollBar"></span>
+              <span class="relative"><%= label %></span>
+            <% end %>
+          <% else %>
+            <% active_class = { "sse" => "bg-teal-600 text-white", "ws" => "bg-amber-500 text-white" }[value] || "bg-blue-600 text-white" %>
+            <%= link_to label, messages_path(transport: value),
+                  class: "px-3 py-1.5 #{@transport == value ? active_class : "bg-white dark:bg-gray-800 text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700"}" %>
+          <% end %>
         <% end %>
-      </div>
       </div>
     </div>
     <div class="flex items-center justify-between">
