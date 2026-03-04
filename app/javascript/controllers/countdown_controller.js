@@ -1,6 +1,7 @@
 import { Controller } from "@hotwired/stimulus"
 
 export default class extends Controller {
+  static targets = ["label", "bar"]
   static values = { minutes: { type: Number, default: 5 } }
 
   connect() {
@@ -19,6 +20,9 @@ export default class extends Controller {
     const diff = Math.max(0, periodSecs - secsIntoInterval)
     const m = Math.floor(diff / 60).toString().padStart(2, "0")
     const s = (diff % 60).toString().padStart(2, "0")
-    this.element.textContent = `${m}:${s}`
+    this.labelTarget.textContent = `${m}:${s}`
+    if (this.hasBarTarget) {
+      this.barTarget.style.width = `${(diff / periodSecs) * 100}%`
+    }
   }
 }
