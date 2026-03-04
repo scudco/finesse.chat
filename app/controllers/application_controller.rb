@@ -16,17 +16,9 @@ class ApplicationController < ActionController::Base
 
   WORDS = File.readlines(Rails.root.join("db/wordlist.txt"), chomp: true).freeze
 
-  # Derive a username deterministically from the session ID so that the same
-  # session always produces the same name and collisions are as unlikely as
-  # two sessions sharing a cryptographic ID.
-  # 1,633 words × 1,633 words = ~2.6M combinations; 50% collision at ~2,300 users.
+  # Pick two distinct random words on first visit and persist in session.
+  # 1,633 × 1,632 = ~2.7M combinations; 50% collision at ~2,300 users.
   def set_username
-    session[:username] ||= begin
-      hash   = Digest::SHA256.hexdigest(request.session.id.to_s).to_i(16)
-      [
-        WORDS[hash % WORDS.length].capitalize,
-        WORDS[(hash / WORDS.length) % WORDS.length].capitalize
-      ].join
-    end
+    session[:username] ||= WORDS.sample(2).map(&:capitalize).join
   end
 end
