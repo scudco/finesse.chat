@@ -12,6 +12,6 @@ turbo-frame {
 }
 
 @keyframes poll-countdown {
-  from { stroke-dashoffset: 0; }
-  to   { stroke-dashoffset: 50.27; }
+  from { transform: scaleX(1); }
+  to   { transform: scaleX(0); }
 }

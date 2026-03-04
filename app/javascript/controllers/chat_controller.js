@@ -9,7 +9,7 @@ window.addEventListener('pageshow', (event) => {
 })
 
 export default class extends Controller {
-  static targets = ["scroll", "messages", "jumpButton", "loadOlder", "hint", "input", "pollRing"]
+  static targets = ["scroll", "messages", "jumpButton", "loadOlder", "hint", "input", "pollBar"]
   static values  = { olderUrl: String, newerUrl: String, pollInterval: { type: Number, default: 20_000 } }
 
   connect() {
@@ -187,18 +187,18 @@ export default class extends Controller {
     this.pollTimeout = setTimeout(() => this.pollForMessages(), this.pollIntervalValue)
   }
 
-  pollRingTargetConnected(el) {
-    this.#startPollRing(el)
+  pollBarTargetConnected(el) {
+    this.#startPollBar(el)
   }
 
   #resetPollRing() {
-    if (!this.hasPollRingTarget) return
-    this.#startPollRing(this.pollRingTarget)
+    if (!this.hasPollBarTarget) return
+    this.#startPollBar(this.pollBarTarget)
   }
 
-  #startPollRing(el) {
+  #startPollBar(el) {
     el.style.animation = "none"
-    el.getBoundingClientRect() // force reflow on SVG element
+    el.getBoundingClientRect() // force reflow
     el.style.animation = `poll-countdown ${this.pollIntervalValue}ms linear forwards`
   }
 
