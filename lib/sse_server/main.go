@@ -39,6 +39,9 @@ func main() {
 	}
 
 	mux := http.NewServeMux()
+	mux.HandleFunc("/up", func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusOK)
+	})
 	mux.HandleFunc("/sse", func(w http.ResponseWriter, r *http.Request) {
 		sseHandler(w, r, db)
 	})
