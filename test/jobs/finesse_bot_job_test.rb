@@ -23,23 +23,23 @@ class FinesseBotJobTest < ActiveSupport::TestCase
     assert result.start_with?("🐱 ")
   end
 
-  # /wtf
-  test "/wtf with a known acronym returns definition" do
-    result = @job.send(:dispatch, "/wtf API")
+  # /wut
+  test "/wut with a known acronym returns definition" do
+    result = @job.send(:dispatch, "/wut API")
     assert_equal "**API** — application programming interface", result
   end
 
-  test "/wtf is case-insensitive for the argument" do
-    assert_equal @job.send(:dispatch, "/wtf api"), @job.send(:dispatch, "/wtf API")
+  test "/wut is case-insensitive for the argument" do
+    assert_equal @job.send(:dispatch, "/wut api"), @job.send(:dispatch, "/wut API")
   end
 
-  test "/wtf with no argument returns usage hint" do
-    result = @job.send(:dispatch, "/wtf")
+  test "/wut with no argument returns usage hint" do
+    result = @job.send(:dispatch, "/wut")
     assert_match(/needs an acronym/, result)
   end
 
-  test "/wtf with unknown acronym returns not-found message" do
-    result = @job.send(:dispatch, "/wtf ZZZNOTREAL")
+  test "/wut with unknown acronym returns not-found message" do
+    result = @job.send(:dispatch, "/wut ZZZNOTREAL")
     assert_match(/no definition found/, result)
   end
 
@@ -48,7 +48,7 @@ class FinesseBotJobTest < ActiveSupport::TestCase
     result = @job.send(:dispatch, "/explode")
     assert_match(/Unknown command/, result)
     assert_match(%r{/time}, result)
-    assert_match(%r{/wtf}, result)
+    assert_match(%r{/wut}, result)
   end
 
   # perform
