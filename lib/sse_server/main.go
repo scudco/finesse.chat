@@ -9,12 +9,139 @@ import (
 	"os"
 	"strconv"
 	"strings"
+	"sync"
 	"time"
 
 	_ "modernc.org/sqlite"
 )
 
-const pollInterval = 10 * time.Millisecond
+const (
+	pollInterval = 10 * time.Millisecond
+	bufferSize   = 200
+)
+
+// message is a decoded SSE event ready to send to clients.
+type message struct {
+	id   int64
+	html string
+}
+
+// broadcaster runs a single poll loop and fans out to all connected clients.
+type broadcaster struct {
+	db      *sql.DB
+	channel []byte
+
+	mu       sync.RWMutex
+	clients  map[chan []message]struct{}
+	buffer   []message // ring of last bufferSize messages
+	latestID int64
+}
+
+func newBroadcaster(db *sql.DB, channel string) *broadcaster {
+	b := &broadcaster{
+		db:      db,
+		channel: []byte(channel),
+		clients: make(map[chan []message]struct{}),
+	}
+	// Seed latestID so fresh connections don't replay history.
+	db.QueryRow("SELECT COALESCE(MAX(id), 0) FROM solid_cable_messages WHERE channel = ?", b.channel).Scan(&b.latestID)
+	go b.run()
+	return b
+}
+
+func (b *broadcaster) run() {
+	ticker := time.NewTicker(pollInterval)
+	defer ticker.Stop()
+	for range ticker.C {
+		rows, err := b.db.Query(
+			`SELECT id, payload FROM solid_cable_messages
+			  WHERE channel = ? AND id > ?
+			  ORDER BY id ASC`,
+			b.channel, b.latestID,
+		)
+		if err != nil {
+			log.Printf("broadcaster query error: %v", err)
+			continue
+		}
+
+		var msgs []message
+		for rows.Next() {
+			var id int64
+			var payload []byte
+			if err := rows.Scan(&id, &payload); err != nil {
+				log.Printf("scan error: %v", err)
+				continue
+			}
+			html, err := extractTurboHTML(payload)
+			if err != nil {
+				log.Printf("payload parse error (id=%d): %v", id, err)
+				continue
+			}
+			msgs = append(msgs, message{id, html})
+		}
+		rows.Close()
+
+		if len(msgs) == 0 {
+			continue
+		}
+
+		b.mu.Lock()
+		b.buffer = append(b.buffer, msgs...)
+		if len(b.buffer) > bufferSize {
+			b.buffer = b.buffer[len(b.buffer)-bufferSize:]
+		}
+		b.latestID = msgs[len(msgs)-1].id
+		for ch := range b.clients {
+			select {
+			case ch <- msgs:
+			default: // slow client — drop; they'll catch up on reconnect via Last-Event-ID
+			}
+		}
+		b.mu.Unlock()
+	}
+}
+
+// subscribe registers a client and returns its channel plus any buffered
+// messages since lastID. Subscribing under the lock closes the race window
+// between catch-up and live delivery.
+func (b *broadcaster) subscribe(lastID int64) (chan []message, []message) {
+	b.mu.Lock()
+	defer b.mu.Unlock()
+
+	var catchup []message
+	for _, m := range b.buffer {
+		if m.id > lastID {
+			catchup = append(catchup, m)
+		}
+	}
+
+	ch := make(chan []message, 50)
+	b.clients[ch] = struct{}{}
+	return ch, catchup
+}
+
+func (b *broadcaster) unsubscribe(ch chan []message) {
+	b.mu.Lock()
+	delete(b.clients, ch)
+	b.mu.Unlock()
+}
+
+// broadcasters is a registry of per-channel broadcasters.
+var (
+	broadcastersMu sync.Mutex
+	broadcasters   = make(map[string]*broadcaster)
+)
+
+func getBroadcaster(db *sql.DB, channel string) *broadcaster {
+	broadcastersMu.Lock()
+	defer broadcastersMu.Unlock()
+	if b, ok := broadcasters[channel]; ok {
+		return b
+	}
+	b := newBroadcaster(db, channel)
+	broadcasters[channel] = b
+	return b
+}
 
 func main() {
 	dbPath := os.Getenv("CABLE_DB_PATH")
@@ -72,66 +199,40 @@ func sseHandler(w http.ResponseWriter, r *http.Request, db *sql.DB) {
 	w.WriteHeader(http.StatusOK)
 	flusher.Flush()
 
-	ctx := r.Context()
-
-	// Fresh connection: start from the current max so we don't replay history
-	// that Rails already rendered server-side.
-	// Reconnection: browser sends Last-Event-ID and we replay only what was
-	// missed while the connection was down.
+	// Fresh connection: use current max so we don't replay history Rails
+	// already rendered server-side.
+	// Reconnection: browser sends Last-Event-ID; we replay only missed events.
 	var lastID int64
 	if raw := r.Header.Get("Last-Event-ID"); raw != "" {
 		if id, err := strconv.ParseInt(raw, 10, 64); err == nil {
 			lastID = id
 		}
 	} else {
-		db.QueryRowContext(ctx, "SELECT COALESCE(MAX(id), 0) FROM solid_cable_messages").Scan(&lastID)
+		lastID = getBroadcaster(db, channel).latestID
 	}
 
+	b := getBroadcaster(db, channel)
+	ch, catchup := b.subscribe(lastID)
+	defer b.unsubscribe(ch)
+
 	log.Printf("client connected  channel=%.40s… last_id=%d", channel, lastID)
-	ticker := time.NewTicker(pollInterval)
-	defer ticker.Stop()
+
+	// Send any messages missed since lastID before streaming live.
+	for _, m := range catchup {
+		writeSSEEvent(w, m.id, m.html)
+	}
+	flusher.Flush()
 
 	for {
 		select {
-		case <-ctx.Done():
+		case <-r.Context().Done():
 			log.Printf("client disconnected last_id=%d", lastID)
 			return
-		case <-ticker.C:
-			// channel is stored as a BINARY blob; pass []byte so SQLite
-			// compares blob-to-blob rather than text-to-blob.
-			rows, err := db.QueryContext(ctx,
-				`SELECT id, payload FROM solid_cable_messages
-				  WHERE channel = ? AND id > ?
-				  ORDER BY id ASC`,
-				[]byte(channel), lastID,
-			)
-			if err != nil {
-				if ctx.Err() != nil {
-					return
-				}
-				log.Printf("query error: %v", err)
-				continue
+		case msgs := <-ch:
+			for _, m := range msgs {
+				writeSSEEvent(w, m.id, m.html)
+				lastID = m.id
 			}
-
-			for rows.Next() {
-				var id int64
-				var payload []byte
-				if err := rows.Scan(&id, &payload); err != nil {
-					log.Printf("scan error: %v", err)
-					continue
-				}
-
-				html, err := extractTurboHTML(payload)
-				if err != nil {
-					log.Printf("payload parse error (id=%d): %v — raw: %s", id, err, payload)
-					lastID = id
-					continue
-				}
-
-				writeSSEEvent(w, id, html)
-				lastID = id
-			}
-			rows.Close()
 			flusher.Flush()
 		}
 	}
