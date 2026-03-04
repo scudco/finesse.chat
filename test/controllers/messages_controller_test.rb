@@ -28,12 +28,13 @@ class MessagesControllerTest < ActionDispatch::IntegrationTest
     assert_response :success
   end
 
-  test "create with slash command does not save user message" do
-    assert_no_difference "Message.count" do
+  test "create with slash command creates exactly one message and it is from FinesseBot" do
+    assert_difference "Message.count", 1 do
       post messages_url,
         params: { message: { content: "/time" } },
         headers: { "Accept" => "text/vnd.turbo-stream.html" }
     end
+    assert_equal FinesseBotJob::BOT_AUTHOR, Message.last.author
     assert_response :success
   end
 
