@@ -3,7 +3,7 @@ require "application_system_test_case"
 class MessagesTest < ApplicationSystemTestCase
   test "visiting the chat shows the page" do
     visit messages_url
-    assert_selector "h1", text: "Finesse Chat"
+    assert_selector "h1", text: ChannelName::NAMES.first
   end
 
   test "sending a message displays it in the chat" do

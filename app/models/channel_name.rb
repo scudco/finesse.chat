@@ -5,7 +5,7 @@ module ChannelName
   def self.current = Rails.cache.fetch(CACHE_KEY) { NAMES.first }
 
   def self.rotate!
-    next_name = (NAMES - [current]).sample
+    next_name = (NAMES - [ current ]).sample
     Rails.cache.write(CACHE_KEY, next_name)
     next_name
   end
