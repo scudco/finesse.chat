@@ -1,0 +1,84 @@
+<% content_for :title, "Finesse — Real-time Rails 8 Demo" %>
+
+<div class="max-w-3xl mx-auto py-16 px-4 space-y-16">
+
+  <%# Hero %>
+  <section class="text-center space-y-6">
+    <h1 class="text-5xl font-bold text-gray-900 dark:text-gray-50 tracking-tight">Finesse</h1>
+    <p class="text-xl text-gray-500 dark:text-gray-400 max-w-xl mx-auto">
+      A live chat demo that lets you compare WebSockets, SSE, and long-polling side-by-side — built with Rails&nbsp;8 and Hotwire.
+    </p>
+    <%= link_to "Enter Chat →", messages_path,
+          class: "inline-block mt-2 px-6 py-3 rounded-lg bg-teal-600 hover:bg-teal-500 text-white font-semibold text-base shadow transition-colors" %>
+  </section>
+
+  <%# Transport Cards %>
+  <section class="space-y-4">
+    <h2 class="text-2xl font-semibold text-gray-800 dark:text-gray-100">Three transports, one app</h2>
+    <p class="text-gray-500 dark:text-gray-400">Switch between transports live from inside the chat. Everything else — the UI, the messages, the slash commands — stays exactly the same.</p>
+    <div class="grid sm:grid-cols-3 gap-4 mt-2">
+      <div class="rounded-xl border border-gray-200 dark:border-gray-700 p-5 space-y-2 bg-white dark:bg-gray-800/50">
+        <span class="inline-block px-2 py-0.5 rounded text-xs font-bold bg-amber-500 text-white">WS</span>
+        <h3 class="font-semibold text-gray-800 dark:text-gray-100">WebSockets</h3>
+        <p class="text-sm text-gray-500 dark:text-gray-400">ActionCable over a persistent socket. SolidCable stores subscriptions in SQLite — no Redis required.</p>
+      </div>
+      <div class="rounded-xl border border-gray-200 dark:border-gray-700 p-5 space-y-2 bg-white dark:bg-gray-800/50">
+        <span class="inline-block px-2 py-0.5 rounded text-xs font-bold bg-teal-600 text-white">SSE</span>
+        <h3 class="font-semibold text-gray-800 dark:text-gray-100">Server-Sent Events</h3>
+        <p class="text-sm text-gray-500 dark:text-gray-400">A Go broadcaster fans out to all connected clients. One DB query per 10 ms regardless of how many users are watching.</p>
+      </div>
+      <div class="rounded-xl border border-gray-200 dark:border-gray-700 p-5 space-y-2 bg-white dark:bg-gray-800/50">
+        <span class="inline-block px-2 py-0.5 rounded text-xs font-bold bg-blue-600 text-white">Polling</span>
+        <h3 class="font-semibold text-gray-800 dark:text-gray-100">HTTP Polling</h3>
+        <p class="text-sm text-gray-500 dark:text-gray-400">Plain fetch every 7.77 s. Handles new messages, edits, and deletes in a single response — no special infrastructure needed.</p>
+      </div>
+    </div>
+  </section>
+
+  <%# SSE Deep Dive %>
+  <section class="space-y-4">
+    <h2 class="text-2xl font-semibold text-gray-800 dark:text-gray-100">The Go SSE broadcaster</h2>
+    <p class="text-gray-500 dark:text-gray-400">
+      A single goroutine polls the database every 10 ms and fans each new message out to an arbitrary number of connected HTTP clients.
+      A 200-message ring buffer lets reconnecting clients catch up via the <code class="text-sm font-mono bg-gray-100 dark:bg-gray-800 px-1 rounded">Last-Event-ID</code> header — no missed messages even through flaky connections.
+    </p>
+    <p class="text-gray-500 dark:text-gray-400">
+      The entire transport switch is three lines of ERB:
+    </p>
+    <pre class="rounded-lg bg-gray-950 text-gray-100 p-4 text-sm font-mono overflow-x-auto"><%= [
+      "&lt;% if @transport == \"sse\" %&gt;",
+      "  &lt;turbo-stream-source src=\"&lt;%= sse_stream_url(\"chat\") %&gt;\"&gt;&lt;/turbo-stream-source&gt;",
+      "&lt;% elsif @transport == \"ws\" %&gt;",
+      "  &lt;%= turbo_stream_from \"chat\" %&gt;",
+      "&lt;% end %&gt;"
+    ].join("\n") %></pre>
+  </section>
+
+  <%# Bot Storm %>
+  <section class="space-y-4">
+    <h2 class="text-2xl font-semibold text-gray-800 dark:text-gray-100">Bot Storm</h2>
+    <p class="text-gray-500 dark:text-gray-400">
+      Hit the <strong class="text-gray-700 dark:text-gray-300">Bot Storm</strong> button in chat to fire 100 messages in rapid succession from multiple simulated bots.
+      Under WebSockets, ActionCable delivers them out of sequence — each one tagged with an
+      <span class="inline-block px-1.5 py-0.5 rounded text-xs font-semibold bg-amber-400/20 text-amber-700 dark:text-amber-400 border border-amber-300 dark:border-amber-600">OUT OF ORDER</span>
+      badge so you can see exactly where reordering occurred.
+      Under SSE and Polling the broadcaster serialises delivery, so messages always arrive in the right order.
+    </p>
+    <p class="text-gray-500 dark:text-gray-400">
+      It's a concrete, visual demonstration of why transport choice matters beyond just latency.
+    </p>
+    <p class="text-gray-500 dark:text-gray-400">
+      The chat room also rotates through a set of channel names on each clear — polling clients pick up the new name on the very next poll, proving that even plain HTTP keeps all clients in sync.
+    </p>
+  </section>
+
+  <%# Footer CTA %>
+  <section class="border-t border-gray-200 dark:border-gray-700 pt-10 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+    <p class="text-sm text-gray-400 dark:text-gray-500">
+      Built with Rails&nbsp;8.1, Hotwire, SolidCable, SolidQueue, Tailwind&nbsp;v4, and Go.
+    </p>
+    <%= link_to "Enter Chat →", messages_path,
+          class: "inline-block px-5 py-2.5 rounded-lg bg-teal-600 hover:bg-teal-500 text-white font-semibold text-sm shadow transition-colors" %>
+  </section>
+
+</div>
