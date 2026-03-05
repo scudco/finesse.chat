@@ -17,8 +17,8 @@ export default class extends Controller {
     this.loadingOlder      = false
     this.hasMore           = true
     this.scrollingToBottom = false
-    this.scrollTarget.scrollTop = this.scrollTarget.scrollHeight
     requestAnimationFrame(() => this.scrollTarget.classList.remove("opacity-0"))
+    this.scrollToBottom()
     this.polling = false
     this.#schedulePoll()
     this.handleVisibilityChange = () => { if (document.visibilityState === "visible") this.pollForMessages() }
@@ -47,6 +47,7 @@ export default class extends Controller {
     clearTimeout(this.pollTimeout)
     clearTimeout(this.loadOlderTimeout)
     clearTimeout(this.dateSepTimeout)
+    clearTimeout(this.scrollBottomTimeout)
     document.removeEventListener("visibilitychange", this.handleVisibilityChange)
     this.observer.disconnect()
     document.removeEventListener("turbo:before-stream-render", this.handleBeforeStreamRender)
@@ -181,8 +182,12 @@ export default class extends Controller {
 
     if (this.atBottom && !this.messagesTarget.querySelector("[data-message-target='editor']:not(.hidden)")) {
       this.polling = true
-      const response = await fetch(this.newerUrlValue, { headers: { Accept: "text/vnd.turbo-stream.html" } })
+      const url = new URL(this.newerUrlValue, location.href)
+      if (this.messagesDigest) url.searchParams.set("digest", this.messagesDigest)
+      const response = await fetch(url, { headers: { Accept: "text/vnd.turbo-stream.html" } })
       if (response.ok) {
+        const digest = response.headers.get("X-Messages-Digest")
+        if (digest) this.messagesDigest = digest
         const html = await response.text()
         if (html.trim()) await Turbo.renderStreamMessage(html)
       }
@@ -285,6 +290,10 @@ export default class extends Controller {
   scrollToBottom(behavior = "instant") {
     this.scrollingToBottom = true
     this.scrollTarget.scrollTo({ top: this.scrollTarget.scrollHeight, behavior })
+    clearTimeout(this.scrollBottomTimeout)
+    this.scrollBottomTimeout = setTimeout(() => {
+      this.scrollTarget.scrollTo({ top: this.scrollTarget.scrollHeight, behavior: "instant" })
+    }, 100)
   }
 
   isAtBottom() {
