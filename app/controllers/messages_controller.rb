@@ -12,10 +12,9 @@ class MessagesController < ApplicationController
 
   # POST /messages/bot_storm
   def bot_storm
-    if BotStormJob.running?
-      head :too_many_requests and return
-    end
-    BotStormJob.perform_later
+    return head :too_many_requests if BotStormJob.running?
+
+    BotStormJob.perform_later(count: 250)
     head :no_content
   end
 
