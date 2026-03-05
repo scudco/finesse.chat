@@ -26,20 +26,30 @@
       </div>
     </div>
     <div class="flex items-center justify-between">
-      <div class="flex text-xs font-medium rounded-lg overflow-hidden border border-gray-200 dark:border-gray-700">
-        <% [["none", "Polling"], ["ws", "WS"], ["sse", "SSE"]].each do |value, label| %>
-          <% if @transport == value && value == "none" %>
-            <%= link_to messages_path(transport: value),
-                  class: "px-3 py-1.5 relative overflow-hidden bg-blue-700 text-white" do %>
-              <span class="absolute inset-0 bg-blue-600 origin-left" data-chat-target="pollBar"></span>
-              <span class="relative"><%= label %></span>
+      <% tooltips = { "none" => "Fetch latest messages every 7.77s", "ws" => "Stream via WebSockets", "sse" => "Stream via Server-Sent Events" } %>
+      <% transports = [["none", "Polling"], ["ws", "WS"], ["sse", "SSE"]] %>
+      <div class="flex text-xs font-medium rounded-lg border border-gray-200 dark:border-gray-700">
+        <% transports.each_with_index do |(value, label), i| %>
+          <% first_item = i == 0; last_item = i == transports.size - 1 %>
+          <% round = first_item ? "rounded-l-lg" : last_item ? "rounded-r-lg" : "" %>
+          <% divider = last_item ? "" : "border-r border-gray-200 dark:border-gray-700" %>
+          <div class="relative group <%= divider %>">
+            <% if @transport == value && value == "none" %>
+              <%= link_to messages_path(transport: value),
+                    class: "block px-3 py-1.5 relative overflow-hidden bg-blue-700 text-white #{round}" do %>
+                <span class="absolute inset-0 bg-blue-600 origin-left" data-chat-target="pollBar"></span>
+                <span class="relative"><%= label %></span>
+              <% end %>
+            <% else %>
+              <% active_class = { "sse" => "bg-teal-600 text-white", "ws" => "bg-amber-500 text-white" }[value] || "bg-blue-600 text-white" %>
+              <%= link_to label, messages_path(transport: value),
+                    data: (@transport == value ? { chat_target: "transportButton" } : {}),
+                    class: "block px-3 py-1.5 #{round} #{@transport == value ? active_class : "bg-white dark:bg-gray-800 text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700"}" %>
             <% end %>
-          <% else %>
-            <% active_class = { "sse" => "bg-teal-600 text-white", "ws" => "bg-amber-500 text-white" }[value] || "bg-blue-600 text-white" %>
-            <%= link_to label, messages_path(transport: value),
-                  data: (@transport == value ? { chat_target: "transportButton" } : {}),
-                  class: "px-3 py-1.5 #{@transport == value ? active_class : "bg-white dark:bg-gray-800 text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700"}" %>
-          <% end %>
+            <div class="absolute bottom-full left-1/2 -translate-x-1/2 mb-1.5 px-2 py-1 text-xs bg-gray-800 dark:bg-gray-700 text-white rounded whitespace-nowrap pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-150 z-50">
+              <%= tooltips[value] %>
+            </div>
+          </div>
         <% end %>
       </div>
       <%= button_to bot_storm_messages_path,

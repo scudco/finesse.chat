@@ -49,7 +49,7 @@ class BotStormJob < ApplicationJob
     "```\nwhile alive:\n    beep()\n    boop()\n```",
     "🫠",
     "have you tried turning it off and **on again**?",
-    "**error:** can hold this many limes\n`stack trace: limes.rb:42`",
+    "**error:** why can't I hold all these limes\n`stack trace: limes.rb:42`",
     <<~MSG,
       ```
        /\\_/\\
