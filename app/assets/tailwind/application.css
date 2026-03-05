@@ -17,6 +17,11 @@ turbo-frame {
   to   { transform: scaleX(0); }
 }
 
+/* Show countdown tooltip on hover (desktop); touch is handled by JS */
+[data-controller~="countdown"]:hover [data-countdown-target="tooltip"] {
+  opacity: 1;
+}
+
 @keyframes storm-bg {
   0%   { background-position: 0% 50%; }
   50%  { background-position: 100% 50%; }
@@ -59,6 +64,7 @@ turbo-frame {
   box-shadow: 0 4px 0 #7f1d1d, inset 0 1px 0 rgba(255,255,255,0.18), 0 2px 8px rgba(185,28,28,0.4);
   transition: transform 80ms ease, box-shadow 80ms ease;
   text-shadow: 0 1px 2px rgba(0,0,0,0.3);
+  transform: translateY(-2px);
 }
 
 .btn-storm:hover:not(:disabled) {
@@ -67,13 +73,13 @@ turbo-frame {
 }
 
 .btn-storm:active:not(:disabled) {
-  transform: translateY(3px);
+  transform: translateY(1px);
   box-shadow: 0 1px 0 #7f1d1d, inset 0 1px 0 rgba(255,255,255,0.1);
 }
 
 .btn-storm:disabled {
   cursor: not-allowed;
-  transform: translateY(3px);
+  transform: translateY(1px);
   box-shadow: 0 1px 0 #7f1d1d;
   animation-play-state: paused;
   filter: saturate(0.6) brightness(0.85);

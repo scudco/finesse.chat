@@ -13,8 +13,19 @@
   <% end %>
 
   <div class="shrink-0 pt-4 pb-2 space-y-1.5">
+    <div class="flex items-center justify-between gap-3">
+      <h1 class="text-2xl font-bold font-mono break-all"><span id="channel_name"><%= @channel_name %></span></h1>
+      <div class="relative shrink-0" data-controller="countdown" data-action="click->countdown#toggleTooltip touchstart->countdown#toggleTooltip">
+        <svg width="20" height="20" viewBox="0 0 20 20" class="rotate-[-90deg] opacity-0 transition-opacity duration-300" data-countdown-target="svg">
+          <circle cx="10" cy="10" r="8" fill="none" stroke="currentColor" stroke-width="2" class="text-gray-200 dark:text-gray-700"/>
+          <circle cx="10" cy="10" r="8" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" class="text-teal-500 dark:text-teal-400" data-countdown-target="ring"/>
+        </svg>
+        <div class="absolute bottom-full right-0 mb-1.5 px-2 py-1 text-xs bg-gray-800 dark:bg-gray-700 text-white rounded whitespace-nowrap pointer-events-none opacity-0 transition-opacity duration-150 z-50" data-countdown-target="tooltip">
+          resets in <span data-countdown-target="label"></span>
+        </div>
+      </div>
+    </div>
     <div class="flex items-center justify-between">
-      <h1 class="text-2xl font-bold">Finesse Chat</h1>
       <div class="flex text-xs font-medium rounded-lg overflow-hidden border border-gray-200 dark:border-gray-700">
         <% [["none", "Polling"], ["ws", "WS"], ["sse", "SSE"]].each do |value, label| %>
           <% if @transport == value && value == "none" %>
@@ -31,16 +42,9 @@
           <% end %>
         <% end %>
       </div>
-    </div>
-    <div class="flex items-center justify-between">
-      <div data-controller="countdown">
-        <p class="text-xs text-gray-400">Chat resets in <span data-countdown-target="label"></span></p>
-        <div class="mt-1 h-px w-48 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
-          <div class="h-full bg-gray-400 dark:bg-gray-500 transition-[width] duration-1000 ease-linear" data-countdown-target="bar"></div>
-        </div>
-      </div>
       <%= button_to bot_storm_messages_path,
             data: { controller: "cooldown", action: "click->cooldown#start", cooldown_duration_value: 5000 },
+            form: { class: "contents" },
             class: "btn-storm" do %>
         <span class="btn-storm-bar origin-left" data-cooldown-target="bar"></span>
         <span class="relative flex items-center gap-1">
@@ -49,6 +53,7 @@
         </span>
       <% end %>
     </div>
+
   </div>
 
   <div class="flex-1 overflow-y-auto overflow-x-hidden border border-gray-200 dark:border-gray-700 rounded-sm bg-gray-50 dark:bg-gray-800 mb-4 opacity-0 transition-opacity duration-600"
