@@ -4,7 +4,7 @@ const currentUser = document.querySelector('meta[name="current-user"]')?.content
 
 
 export default class extends Controller {
-  static targets = ["scroll", "messages", "jumpButton", "loadOlder", "hint", "input", "pollBar"]
+  static targets = ["scroll", "messages", "jumpButton", "loadOlder", "hint", "input", "pollBar", "transportButton"]
   static values  = { olderUrl: String, newerUrl: String, pollInterval: { type: Number, default: 20_000 }, transport: String }
 
   connect() {
@@ -101,8 +101,13 @@ export default class extends Controller {
 
   deduplicateAppend(event) {
     const stream = event.detail.newStream
-    if (stream.action !== "append" && stream.action !== "prepend") return
     if (stream.target !== this.messagesTarget.id) return
+
+    if (this.transportValue !== "none" && this.hasTransportButtonTarget) {
+      this.#flashTransportButton()
+    }
+
+    if (stream.action !== "append" && stream.action !== "prepend") return
 
     const el = stream.templateContent?.firstElementChild
     if (!el?.id) return
@@ -126,6 +131,13 @@ export default class extends Controller {
   }
 
   // private
+
+  #flashTransportButton() {
+    const el = this.transportButtonTarget
+    el.classList.remove("activity-flash")
+    el.getBoundingClientRect() // force reflow to restart animation
+    el.classList.add("activity-flash")
+  }
 
   #parseId(id) {
     const match = id?.match(/\d+$/)
