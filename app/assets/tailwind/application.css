@@ -11,6 +11,7 @@ turbo-frame {
   display: contents;
 }
 
+
 @keyframes poll-countdown {
   from { transform: scaleX(1); }
   to   { transform: scaleX(0); }
