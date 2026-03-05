@@ -2,15 +2,10 @@ import { Controller } from "@hotwired/stimulus"
 
 const currentUser = document.querySelector('meta[name="current-user"]')?.content
 
-// Reload when iOS Safari restores the page from bfcache — stale messages
-// can't be patched by polling alone since pollForMessages only appends newer.
-window.addEventListener('pageshow', (event) => {
-  if (event.persisted) window.location.reload()
-})
 
 export default class extends Controller {
   static targets = ["scroll", "messages", "jumpButton", "loadOlder", "hint", "input", "pollBar"]
-  static values  = { olderUrl: String, newerUrl: String, pollInterval: { type: Number, default: 20_000 } }
+  static values  = { olderUrl: String, newerUrl: String, pollInterval: { type: Number, default: 20_000 }, transport: String }
 
   connect() {
     this.atBottom          = true
@@ -21,8 +16,10 @@ export default class extends Controller {
     this.scrollToBottom()
     this.polling = false
     this.#schedulePoll()
-    this.handleVisibilityChange = () => { if (document.visibilityState === "visible") this.pollForMessages() }
+    this.handleVisibilityChange = () => { if (document.visibilityState === "visible") this.#fetchLatest() }
+    this.handlePageShow = (e) => { if (e.persisted) this.#fetchLatest() }
     document.addEventListener("visibilitychange", this.handleVisibilityChange)
+    window.addEventListener("pageshow", this.handlePageShow)
     this.observer = new MutationObserver(() => {
       if (this.atBottom || this.scrollingToBottom) {
         this.trimOldMessages()
@@ -49,6 +46,7 @@ export default class extends Controller {
     clearTimeout(this.dateSepTimeout)
     clearTimeout(this.scrollBottomTimeout)
     document.removeEventListener("visibilitychange", this.handleVisibilityChange)
+    window.removeEventListener("pageshow", this.handlePageShow)
     this.observer.disconnect()
     document.removeEventListener("turbo:before-stream-render", this.handleBeforeStreamRender)
   }
@@ -182,15 +180,7 @@ export default class extends Controller {
 
     if (this.atBottom && !this.messagesTarget.querySelector("[data-message-target='editor']:not(.hidden)")) {
       this.polling = true
-      const url = new URL(this.newerUrlValue, location.href)
-      if (this.messagesDigest) url.searchParams.set("digest", this.messagesDigest)
-      const response = await fetch(url, { headers: { Accept: "text/vnd.turbo-stream.html" } })
-      if (response.ok) {
-        const digest = response.headers.get("X-Messages-Digest")
-        if (digest) this.messagesDigest = digest
-        const html = await response.text()
-        if (html.trim()) await Turbo.renderStreamMessage(html)
-      }
+      await this.#fetchLatest()
       this.polling = false
       this.#resetPollRing()
     }
@@ -198,7 +188,20 @@ export default class extends Controller {
     this.#schedulePoll()
   }
 
+  async #fetchLatest() {
+    const url = new URL(this.newerUrlValue, location.href)
+    if (this.messagesDigest) url.searchParams.set("digest", this.messagesDigest)
+    const response = await fetch(url, { headers: { Accept: "text/vnd.turbo-stream.html" } })
+    if (response.ok) {
+      const digest = response.headers.get("X-Messages-Digest")
+      if (digest) this.messagesDigest = digest
+      const html = await response.text()
+      if (html.trim()) await Turbo.renderStreamMessage(html)
+    }
+  }
+
   #schedulePoll() {
+    if (this.transportValue !== "none") return
     clearTimeout(this.pollTimeout)
     this.pollTimeout = setTimeout(() => this.pollForMessages(), this.pollIntervalValue)
   }

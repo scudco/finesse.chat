@@ -4,7 +4,8 @@
      data-controller="chat"
      data-chat-older-url-value="<%= older_messages_path %>"
      data-chat-newer-url-value="<%= newer_messages_path %>"
-     data-chat-poll-interval-value="7777">
+     data-chat-poll-interval-value="7777"
+     data-chat-transport-value="<%= @transport %>">
   <% if @transport == "sse" %>
     <turbo-stream-source src="<%= sse_stream_url("chat") %>"></turbo-stream-source>
   <% elsif @transport == "ws" %>
@@ -38,9 +39,13 @@
         </div>
       </div>
       <%= button_to bot_storm_messages_path,
-            class: "rounded-lg px-3 py-1.5 bg-red-500 hover:bg-red-400 text-white text-xs font-medium cursor-pointer flex items-center gap-1" do %>
-        <%= heroicon "bolt", variant: :solid, options: { class: "w-3 h-3 shrink-0" } %>
-        Bot Storm
+            data: { controller: "cooldown", action: "click->cooldown#start", cooldown_duration_value: 5000 },
+            class: "relative overflow-hidden rounded-lg px-3 py-1.5 bg-red-500 hover:bg-red-400 text-white text-xs font-medium cursor-pointer flex items-center gap-1 disabled:cursor-not-allowed disabled:hover:bg-red-500" do %>
+        <span class="absolute inset-0 bg-red-600 origin-left" data-cooldown-target="bar"></span>
+        <span class="relative flex items-center gap-1">
+          <%= heroicon "bolt", variant: :solid, options: { class: "w-3 h-3 shrink-0" } %>
+          Bot Storm
+        </span>
       <% end %>
     </div>
   </div>
