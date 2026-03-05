@@ -1,14 +1,16 @@
 require "csv"
 
-class FinesseBotJob < ApplicationJob
-  BOT_AUTHOR  = "FinesseBot"
-  CAT_FACTS   = File.readlines(Rails.root.join("db/catfacts.txt"), chomp: true).freeze
-  DOG_FACTS   = File.readlines(Rails.root.join("db/dogfacts.txt"), chomp: true).freeze
-  ACRONYMS    = CSV.read(Rails.root.join("db/acronyms.tsv"), col_sep: "\t").to_h.freeze
+class FinesseBot
+  BOT_AUTHOR = "FinesseBot"
+  CAT_FACTS  = File.readlines(Rails.root.join("db/catfacts.txt"), chomp: true).freeze
+  DOG_FACTS  = File.readlines(Rails.root.join("db/dogfacts.txt"), chomp: true).freeze
+  ACRONYMS   = CSV.read(Rails.root.join("db/acronyms.tsv"), col_sep: "\t").to_h.freeze
 
-  def perform(input, invoked_by: nil)
+  def self.call(input, invoked_by: nil) = new.call(input, invoked_by:)
+
+  def call(input, invoked_by: nil)
     content = dispatch(input.strip)
-    Message.create!(author: BOT_AUTHOR, content: content, invoked_by:) if content
+    Message.create!(author: BOT_AUTHOR, content:, invoked_by:) if content
   end
 
   private
@@ -25,13 +27,9 @@ class FinesseBotJob < ApplicationJob
     end
   end
 
-  def time
-    "🕐 **#{Time.current.strftime("%H:%M:%S %Z")}**"
-  end
+  def time = "🕐 **#{Time.current.strftime("%H:%M:%S %Z")}**"
 
-  def unknown(command)
-    "Unknown command: `#{command}`\n\n#{help}"
-  end
+  def unknown(command) = "Unknown command: `#{command}`\n\n#{help}"
 
   def help
     <<~MSG
@@ -45,13 +43,9 @@ class FinesseBotJob < ApplicationJob
     MSG
   end
 
-  def dog_fact
-    "🐶 #{DOG_FACTS.sample}"
-  end
+  def dog_fact = "🐶 #{DOG_FACTS.sample}"
 
-  def cat_fact
-    "🐱 #{CAT_FACTS.sample}"
-  end
+  def cat_fact = "🐱 #{CAT_FACTS.sample}"
 
   def wut(acronym)
     key = acronym.to_s.strip.upcase

@@ -1,4 +1,4 @@
-<%# locals: (message:, current_user: nil) %>
+<%# locals: (message:, current_user: nil, editing: false) %>
 <%# own_message: render controls when current_user is unknown (broadcast) or is the author %>
 <% own_message = current_user.nil? || message.author == current_user %>
 
@@ -35,13 +35,16 @@
           data-controller="local-time"><%= message.created_at.strftime("%H:%M") %></time>
     </div>
   </div>
-  <div class="text-gray-800 dark:text-gray-100 max-w-0 min-w-full [overflow-wrap:anywhere] chat-content"
+  <div class="text-gray-800 dark:text-gray-100 max-w-0 min-w-full [overflow-wrap:anywhere] chat-content <%= "hidden" if editing %>"
        <% if own_message %>data-message-target="content"<% end %>>
     <%= render_chat_markdown(message.content) %>
   </div>
   <% if own_message %>
-    <div class="hidden" data-message-target="editor">
+    <div class="<%= editing ? "" : "hidden" %>" data-message-target="editor">
       <%= form_with model: message, data: { action: "submit->message#submitted" } do |f| %>
+        <% if message.errors.any? %>
+          <p class="text-xs text-red-500 mb-1"><%= message.errors.full_messages.first %></p>
+        <% end %>
         <%= f.text_area :content,
               class: "w-full text-sm text-gray-800 dark:text-gray-100 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded px-2 py-1 resize-none focus:outline-none focus:ring-1 focus:ring-blue-500",
               rows: 3,

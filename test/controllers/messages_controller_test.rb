@@ -34,7 +34,7 @@ class MessagesControllerTest < ActionDispatch::IntegrationTest
         params: { message: { content: "/time" } },
         headers: { "Accept" => "text/vnd.turbo-stream.html" }
     end
-    assert_equal FinesseBotJob::BOT_AUTHOR, Message.last.author
+    assert_equal FinesseBot::BOT_AUTHOR, Message.last.author
     assert_response :success
   end
 

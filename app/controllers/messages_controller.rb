@@ -12,7 +12,7 @@ class MessagesController < ApplicationController
 
   # POST /messages/bot_storm
   def bot_storm
-    if SolidQueue::Job.where(class_name: "BotStormJob", finished_at: nil).exists?
+    if BotStormJob.running?
       head :too_many_requests and return
     end
     BotStormJob.perform_later
@@ -21,8 +21,8 @@ class MessagesController < ApplicationController
 
   # GET /messages/older?before_id=N  (turbo stream)
   def older
-    messages = Message.where(id: ...params[:before_id].to_i).order(id: :desc).limit(50).reverse
-    render turbo_stream: messages.reverse.map { |message| turbo_stream.prepend("messages", partial: "message", locals: { message: }) }
+    messages = Message.where(id: ...params[:before_id].to_i).order(id: :desc).limit(50)
+    render turbo_stream: messages.map { |message| turbo_stream.prepend("messages", partial: "message", locals: { message: }) }
   end
 
   # GET /messages/newer  (turbo stream, polling fallback — replaces full list)
@@ -42,7 +42,7 @@ class MessagesController < ApplicationController
 
     if SlashCommand.match?(content)
       cmd = SlashCommand.new(content, author: current_username)
-      @bot_message = FinesseBotJob.perform_now(cmd.bot_input, invoked_by: current_username) if cmd.bot_input
+      @bot_message = FinesseBot.call(cmd.bot_input, invoked_by: current_username) if cmd.bot_input
       @message = cmd.message
     else
       @message = Message.new(message_params.merge(author: current_username))
@@ -61,8 +61,11 @@ class MessagesController < ApplicationController
 
   # PATCH/PUT /messages/1
   def update
-    @message.update(message_params)
-    render turbo_stream: turbo_stream.replace(@message, partial: "message", locals: { message: @message, current_user: current_username })
+    if @message.update(message_params)
+      render turbo_stream: turbo_stream.replace(@message, partial: "message", locals: { message: @message, current_user: current_username })
+    else
+      render turbo_stream: turbo_stream.replace(@message, partial: "message", locals: { message: @message, current_user: current_username, editing: true })
+    end
   end
 
   # DELETE /messages/1
@@ -78,9 +81,7 @@ class MessagesController < ApplicationController
     end
 
     # Only allow a list of trusted parameters through.
-    def message_params
-      params.expect(message: %i[ content ])
-    end
+    def message_params = params.expect(message: %i[ content ])
 
     def handle_csrf_error
       respond_to do |format|

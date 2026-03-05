@@ -1,4 +1,6 @@
 class BotStormJob < ApplicationJob
+  def self.running? = SolidQueue::Job.where(class_name: name, finished_at: nil).exists?
+
   BOTS = %w[Beeper Zappy Clanker Whirr Bloop Fizzbot Zork Glitch Nibble Voltbot].freeze
   MESSAGES = [
     "beep boop 🤖",
