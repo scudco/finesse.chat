@@ -3,6 +3,8 @@ class ClearMessagesJob < ApplicationJob
 
   def perform
     Message.delete_all
+    new_name = ChannelName.rotate!
+    Turbo::StreamsChannel.broadcast_update_to("chat", target: "channel_name", html: new_name)
     Turbo::StreamsChannel.broadcast_update_to(
       "chat",
       target: "messages",

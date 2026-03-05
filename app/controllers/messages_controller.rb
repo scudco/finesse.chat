@@ -8,6 +8,7 @@ class MessagesController < ApplicationController
     session[:transport] = params[:transport] if params[:transport].in?(%w[ws sse none])
     @transport = session[:transport] || "ws"
     @messages = Message.order(:id).last(50)
+    @channel_name = ChannelName.current
   end
 
   # POST /messages/bot_storm
@@ -27,12 +28,16 @@ class MessagesController < ApplicationController
   # GET /messages/newer  (turbo stream, polling fallback — replaces full list)
   def newer
     messages = Message.order(:id).last(50)
-    digest = "#{messages.last&.id}-#{messages.maximum(:updated_at)&.to_i}"
+    channel_name = ChannelName.current
+    digest = "#{messages.last&.id}-#{messages.maximum(:updated_at)&.to_i}-#{channel_name}"
     if params[:digest] == digest
       head :no_content and return
     end
     response.set_header("X-Messages-Digest", digest)
-    render turbo_stream: turbo_stream.update("messages", partial: "messages_list", locals: { messages: })
+    render turbo_stream: [
+      turbo_stream.update("messages", partial: "messages_list", locals: { messages: }),
+      turbo_stream.update("channel_name", html: channel_name)
+    ]
   end
 
   # POST /messages
