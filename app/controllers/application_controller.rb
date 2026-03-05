@@ -8,9 +8,7 @@ class ApplicationController < ActionController::Base
   before_action :set_username
   helper_method :current_username
 
-  def current_username
-    session[:username]
-  end
+  def current_username = session[:username]
 
   private
 
