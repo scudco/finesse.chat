@@ -2,7 +2,7 @@ require "application_system_test_case"
 
 class MessagesTest < ApplicationSystemTestCase
   def setup
-    visit messages_url
+    visit root_url
     click_button "Start chatting"
   end
 
@@ -19,7 +19,6 @@ class MessagesTest < ApplicationSystemTestCase
   test "empty state is shown when there are no messages" do
     Message.delete_all
     visit messages_url
-    click_button "Start chatting"
     assert_selector ".chat-empty-state"
   end
 end

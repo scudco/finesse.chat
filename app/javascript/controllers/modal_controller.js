@@ -1,6 +1,6 @@
 import { Controller } from "@hotwired/stimulus"
 
-const STORAGE_KEY = "finesse-chat:show-on-launch"
+const PREF_KEY = "finesse-chat:show-on-launch" // "false" = user opted out
 
 export default class extends Controller {
   static targets = ["panel", "showOnLaunch"]
@@ -8,11 +8,13 @@ export default class extends Controller {
 
   connect() {
     this.hideTimeout = null
-    if (this.autoOpenValue && localStorage.getItem(STORAGE_KEY) !== "false") {
+    if (this.autoOpenValue &&
+        localStorage.getItem(PREF_KEY) !== "false" &&
+        window.location.pathname === "/") {
       requestAnimationFrame(() => this.open())
     }
     if (this.hasShowOnLaunchTarget) {
-      this.showOnLaunchTarget.checked = localStorage.getItem(STORAGE_KEY) !== "false"
+      this.showOnLaunchTarget.checked = localStorage.getItem(PREF_KEY) !== "false"
     }
   }
 
@@ -39,9 +41,9 @@ export default class extends Controller {
 
   toggleShowOnLaunch(event) {
     if (event.target.checked) {
-      localStorage.removeItem(STORAGE_KEY)
+      localStorage.removeItem(PREF_KEY)
     } else {
-      localStorage.setItem(STORAGE_KEY, "false")
+      localStorage.setItem(PREF_KEY, "false")
     }
   }
 
