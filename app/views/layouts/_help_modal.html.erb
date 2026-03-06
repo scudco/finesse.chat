@@ -1,17 +1,59 @@
 <div hidden
      class="fixed inset-0 z-50 opacity-0 pointer-events-none transition-opacity duration-200"
      data-controller="modal"
+     data-modal-auto-open-value="true"
      data-action="click->modal#backdropClick keydown@window->modal#escape open-modal@window->modal#open">
   <div class="absolute inset-0 bg-black/50 dark:bg-black/70"></div>
   <div class="relative flex items-center justify-center min-h-full p-4">
-    <div class="bg-white dark:bg-gray-900 rounded-xl shadow-2xl w-full max-w-lg max-h-[85dvh] flex flex-col border border-gray-200 dark:border-gray-700"
+    <div class="bg-white dark:bg-gray-900 rounded-xl shadow-2xl w-full max-w-xl max-h-[85dvh] flex flex-col border border-gray-200 dark:border-gray-700"
          data-modal-target="panel">
+
       <div class="flex items-center justify-between px-5 py-4 border-b border-gray-200 dark:border-gray-700 shrink-0">
-        <h2 class="font-semibold text-gray-800 dark:text-gray-100 text-base">Help & Reference</h2>
+        <h2 class="font-semibold text-gray-800 dark:text-gray-100 text-base">Finesse Chat - An SSE driven microapp</h2>
         <button data-action="click->modal#close"
                 class="w-7 h-7 flex items-center justify-center rounded-md hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-500 dark:text-gray-400 cursor-pointer text-lg leading-none">✕</button>
       </div>
+
       <div class="overflow-y-auto px-5 py-4 space-y-6 text-sm text-gray-700 dark:text-gray-300">
+
+        <p class="text-gray-500 dark:text-gray-400">
+          A chat demo that lets you compare WebSockets, Server-Sent Events, and polling — built with Rails&nbsp;8 and Hotwire.
+        </p>
+
+        <section>
+          <h3 class="font-semibold text-gray-800 dark:text-gray-100 mb-2">The Three Transports</h3>
+          <dl class="space-y-1.5">
+            <div class="flex flex-col gap-2">
+              <dt class="w-16"><span class="block text-center py-0.5 rounded text-xs font-semibold bg-blue-600 text-white">Polling</span></dt>
+              <dd class="mb-4">This transport will perform a regular old fetch every 7.77 seconds to get the latest messages. This is the simplest approach to updating data. Very reliable, but definitely not real-time.</dd>
+              <dt class="w-16"><span class="block text-center py-0.5 rounded text-xs font-semibold bg-amber-500 text-white">WS</span></dt>
+              <dd class="mb-4">SolidCable comes with WebSockets integration by default without any real configuration needed in Rails 8. It is, however, more finicky when dealing with ordered data and reconnects. This was the fastest in my testing and could <i>conceivably</i> allow bi-directional communication.</dd>
+              <dt class="w-16"><span class="block text-center py-0.5 rounded text-xs font-semibold bg-teal-600 text-white">SSE</span></dt>
+              <dd class="mb-4">SSE being a long-lived HTTP connection means browsers work well by default and this app demonstrates its reliability and speed compared to WebSockets.</dd>
+            </div>
+          </dl>
+        </section>
+
+        <section>
+          <h3 class="font-semibold text-red-600 dark:text-red-500 mb-2">⚡ Bot Storm</h3>
+          <p class="text-gray-500 dark:text-gray-400 mb-2">
+          Hit the <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs font-semibold text-white bg-red-600 pointer-events-none select-none">⚡ Bot Storm</span> button to fire a burst of messages from simulated bots.
+          </p>
+          <p class="text-gray-500 dark:text-gray-400 mb-2">
+          When using <span class="inline-block px-1.5 py-0.5 rounded text-xs font-semibold bg-amber-500 text-white">WebSockets</span>, you can expect to see messages tagged with an <span class="inline-block px-1 py-0.5 rounded text-xs font-semibold bg-amber-400/20 text-amber-700 dark:text-amber-400 border border-amber-300 dark:border-amber-600">OUT OF ORDER</span> badge. This demonstrates that WebSockets has a decent potential of receiving/processing data out-of-order.
+          </p>
+        </section>
+
+        <section>
+          <h3 class="font-semibold text-gray-800 dark:text-gray-100 mb-2">Tips</h3>
+          <ul class="space-y-1.5 list-disc list-inside">
+            <li>The chat resets every five minutes — the channel name rotates on each reset</li>
+            <li>Most markdown is supported — **bold**, `code`, *italic*, and more</li>
+            <li>Press <kbd class="px-1.5 py-0.5 rounded bg-gray-100 dark:bg-gray-800 font-mono text-xs">↑</kbd> in the empty input to edit your last message</li>
+            <li>Hover one of your messages to reveal edit/delete controls</li>
+            <li>Click the ↺ icon next to your username to get a new random username</li>
+          </ul>
+        </section>
 
         <section>
           <h3 class="font-semibold text-gray-800 dark:text-gray-100 mb-2">Slash Commands</h3>
@@ -25,12 +67,12 @@
               <dd>Post the current server time</dd>
             </div>
             <div class="flex gap-2">
-              <dt class="font-mono text-teal-600 dark:text-teal-400 shrink-0 w-32">/meow</dt>
-              <dd>A cat appears</dd>
+              <dt class="font-mono text-teal-600 dark:text-teal-400 shrink-0 w-32">/meow, /🐱</dt>
+              <dd>Thanks for signing up for Cat Facts!</dd>
             </div>
             <div class="flex gap-2">
-              <dt class="font-mono text-teal-600 dark:text-teal-400 shrink-0 w-32">/woof</dt>
-              <dd>A dog appears</dd>
+              <dt class="font-mono text-teal-600 dark:text-teal-400 shrink-0 w-32">/woof, /🐶</dt>
+              <dd>Dog Facts for the refined factician</dd>
             </div>
             <div class="flex gap-2">
               <dt class="font-mono text-teal-600 dark:text-teal-400 shrink-0 w-32">/wut &lt;acronym&gt;</dt>
@@ -43,36 +85,20 @@
           </dl>
         </section>
 
-        <section>
-          <h3 class="font-semibold text-gray-800 dark:text-gray-100 mb-2">Easter Eggs & Tips</h3>
-          <ul class="space-y-1.5 list-disc list-inside">
-            <li>Markdown is supported — **bold**, `code`, *italic*, and more</li>
-            <li>Press <kbd class="px-1.5 py-0.5 rounded bg-gray-100 dark:bg-gray-800 font-mono text-xs">↑</kbd> in the empty input to edit your last message</li>
-            <li>Hover a message to reveal edit and delete buttons</li>
-            <li>Click the ↺ icon next to your username (top-right) to get a new random username</li>
-            <li>The channel name rotates on each chat reset — watch for it on all three transports</li>
-            <li>Click the theme button in the top-right to cycle System → Light → Dark</li>
-          </ul>
-        </section>
+      </div>
 
-        <section>
-          <h3 class="font-semibold text-gray-800 dark:text-gray-100 mb-2">Transports</h3>
-          <ul class="space-y-1.5">
-            <li class="flex items-start gap-2">
-              <span class="mt-0.5 px-1.5 py-0.5 rounded text-xs font-semibold bg-amber-500 text-white shrink-0">WS</span>
-              <span>WebSockets via ActionCable + SolidCable — the default, lowest latency</span>
-            </li>
-            <li class="flex items-start gap-2">
-              <span class="mt-0.5 px-1.5 py-0.5 rounded text-xs font-semibold bg-teal-600 text-white shrink-0">SSE</span>
-              <span>Server-Sent Events via a Go broadcaster — one DB query per 10 ms regardless of client count</span>
-            </li>
-            <li class="flex items-start gap-2">
-              <span class="mt-0.5 px-1.5 py-0.5 rounded text-xs font-semibold bg-blue-600 text-white shrink-0">Polling</span>
-              <span>Plain HTTP polling every 7.77 s — handles new messages, edits, and deletes in one shot</span>
-            </li>
-          </ul>
-        </section>
-
+      <div class="px-5 py-3 border-t border-gray-200 dark:border-gray-700 shrink-0 flex items-center justify-between gap-4">
+        <label class="flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400 cursor-pointer select-none">
+          <input type="checkbox" checked
+                 class="w-3.5 h-3.5 rounded accent-teal-600 cursor-pointer"
+                 data-modal-target="showOnLaunch"
+                 data-action="change->modal#toggleShowOnLaunch">
+          Show on launch
+        </label>
+        <button data-action="click->modal#close"
+                class="px-4 py-1.5 rounded-lg bg-teal-600 hover:bg-teal-500 text-white text-xs font-semibold transition-colors cursor-pointer">
+          Start chatting
+        </button>
       </div>
     </div>
   </div>
