@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title><%= content_for(:title) || "Finesse" %></title>
+    <title><%= content_for(:title) || "Finesse Chat - An SSE driven microapp" %></title>
 
     <meta name="turbo-refresh-method" content="morph">
     <meta name="turbo-refresh-scroll" content="preserve">
@@ -39,15 +39,15 @@
     </script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..700;1,9..144,300..700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
     <%= csrf_meta_tags %>
     <%= csp_meta_tag %>
 
     <%= yield :head %>
 
-    <link rel="icon" href="/icon.png?v=2" type="image/png">
-    <link rel="icon" href="/icon.svg?v=2" type="image/svg+xml">
-    <link rel="apple-touch-icon" href="/icon.png?v=2">
+    <link rel="icon" href="/icon2.png" type="image/png">
+    <link rel="icon" href="/icon2.png" type="image/png" sizes="any">
+    <link rel="apple-touch-icon" href="/icon2.png">
     <link rel="manifest" href="/manifest.json">
 
     <%= stylesheet_link_tag :app, "data-turbo-track": "reload" %>
@@ -56,7 +56,10 @@
 
   <body class="bg-white dark:bg-gray-900 dark:text-gray-100">
     <nav class="fixed top-0 w-full h-14 bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between px-6 z-10">
-      <%= link_to "FC", root_path, class: "font-semibold text-gray-800 dark:text-gray-100 hover:text-teal-600 dark:hover:text-teal-400 transition-colors" %>
+      <%= link_to root_path, class: "flex items-center gap-2 font-semibold text-gray-800 dark:text-gray-100 hover:text-teal-600 dark:hover:text-teal-400 transition-colors" do %>
+        <img src="/icon2.png" class="w-7 h-7 rounded-md" alt="Finesse Chat">
+        <span class="hidden md:inline font-serif">Finesse Chat</span>
+      <% end %>
       <div class="flex items-center gap-3">
         <button data-controller="modal-trigger"
                 data-action="click->modal-trigger#open"

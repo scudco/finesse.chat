@@ -4,6 +4,7 @@
 
 @theme {
   --font-sans: 'Inter', sans-serif;
+  --font-serif: 'Fraunces', Georgia, serif;
   --font-mono: 'JetBrains Mono', monospace;
 }
 
@@ -46,6 +47,7 @@ turbo-frame {
 }
 
 .btn-storm {
+  font-family: var(--font-sans);
   position: relative;
   overflow: hidden;
   color: white;
