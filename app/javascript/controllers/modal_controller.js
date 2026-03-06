@@ -10,7 +10,7 @@ export default class extends Controller {
     this.hideTimeout = null
     if (this.autoOpenValue &&
         localStorage.getItem(PREF_KEY) !== "false" &&
-        window.location.pathname === "/") {
+        window.location.pathname === "/" && !new URLSearchParams(window.location.search).has("transport")) {
       requestAnimationFrame(() => this.open())
     }
     if (this.hasShowOnLaunchTarget) {
