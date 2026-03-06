@@ -29,9 +29,9 @@
         <section>
           <h3 class="font-semibold font-sans text-gray-800 dark:text-gray-100 mb-2">The Three Transports</h3>
           <div class="space-y-2">
-            <div class="rounded-lg border border-blue-200 dark:border-blue-800 bg-blue-50 dark:bg-blue-950/40 px-3 py-2 text-gray-600 dark:text-gray-300"><span class="text-blue-600">Polling</span> performs a fetch every 7.77 seconds. The simplest approach — very reliable, but not real-time. A great baseline and fallback.</div>
-            <div class="rounded-lg border border-amber-200 dark:border-amber-800 bg-amber-50 dark:bg-amber-950/40 px-3 py-2 text-gray-600 dark:text-gray-300"><span class="text-amber-500">WebSockets</span> via SolidCable — lowest latency, but more finicky with ordered data and reconnects. The fastest but least reliable transport in testing.</div>
-            <div class="rounded-lg border border-teal-200 dark:border-teal-800 bg-teal-50 dark:bg-teal-950/40 px-3 py-2 text-gray-600 dark:text-gray-300"><span class="text-teal-600">Server-Sent Events</span> over a long-lived HTTP connection — browsers handle it natively, reliable delivery, and this app demonstrates its speed advantage over WebSockets.</div>
+            <div class="rounded-lg border border-blue-200 dark:border-blue-800 bg-blue-50 dark:bg-blue-950/40 px-3 py-2 text-gray-600 dark:text-gray-300"><span class="text-blue-600">Polling</span> will perform a regular old fetch every 7.77 seconds to get the latest messages. It is the simplest approach to updating data. Very reliable, but definitely not real-time. Great to have as a baseline and fallback.</div>
+            <div class="rounded-lg border border-amber-200 dark:border-amber-800 bg-amber-50 dark:bg-amber-950/40 px-3 py-2 text-gray-600 dark:text-gray-300"><span class="text-amber-500">WebSockets</span> via SolidCable is available in Rails 8 without any real configuration needed. It is, however, more finicky when dealing with ordered data and reconnects. This was the fastest but least reliable transport in my testing.</div>
+            <div class="rounded-lg border border-teal-200 dark:border-teal-800 bg-teal-50 dark:bg-teal-950/40 px-3 py-2 text-gray-600 dark:text-gray-300"><span class="text-teal-600">Server-Sent Events</span> being a long-lived HTTP connection means browsers work well with it by default. This app demonstrates its reliability and speed compared to WebSockets.</div>
           </div>
         </section>
 
