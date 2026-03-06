@@ -1,10 +1,19 @@
 import { Controller } from "@hotwired/stimulus"
 
+const STORAGE_KEY = "finesse-chat:show-on-launch"
+
 export default class extends Controller {
-  static targets = ["panel"]
+  static targets = ["panel", "showOnLaunch"]
+  static values = { autoOpen: Boolean }
 
   connect() {
     this.hideTimeout = null
+    if (this.autoOpenValue && localStorage.getItem(STORAGE_KEY) !== "false") {
+      requestAnimationFrame(() => this.open())
+    }
+    if (this.hasShowOnLaunchTarget) {
+      this.showOnLaunchTarget.checked = localStorage.getItem(STORAGE_KEY) !== "false"
+    }
   }
 
   disconnect() {
@@ -26,6 +35,14 @@ export default class extends Controller {
       this.element.setAttribute("hidden", "")
     }, 200)
     document.body.style.overflow = ""
+  }
+
+  toggleShowOnLaunch(event) {
+    if (event.target.checked) {
+      localStorage.removeItem(STORAGE_KEY)
+    } else {
+      localStorage.setItem(STORAGE_KEY, "false")
+    }
   }
 
   escape(event) {
