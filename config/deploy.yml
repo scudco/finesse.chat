@@ -1,4 +1,4 @@
-service: finesse.chat
+service: finesse-chat
 image: scudco/finesse.chat
 
 servers:
