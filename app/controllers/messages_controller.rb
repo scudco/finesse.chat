@@ -5,7 +5,7 @@ class MessagesController < ApplicationController
 
   # GET /messages or /messages.json
   def index
-    session[:transport] = params[:transport] if params[:transport].in?(%w[ws sse none])
+    session[:transport] = params[:transport] if params[:transport].in?(%w[ws sse polling])
     @transport = session[:transport] || "ws"
     @messages = Message.order(:id).last(50)
     @channel_name = ChannelName.current
