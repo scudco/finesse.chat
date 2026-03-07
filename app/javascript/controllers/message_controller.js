@@ -1,13 +1,13 @@
 import { Controller } from "@hotwired/stimulus"
 
-const currentUser = document.querySelector('meta[name="current-user"]')?.content
+const currentUser = () => document.getElementById("current-username")?.textContent
 
 export default class extends Controller {
   static targets = ["content", "editor", "actions", "textarea"]
   static values  = { author: String }
 
   connect() {
-    if (this.authorValue !== currentUser) {
+    if (this.authorValue !== currentUser()) {
       if (this.hasActionsTarget) this.actionsTarget.remove()
       if (this.hasEditorTarget) this.editorTarget.remove()
     }

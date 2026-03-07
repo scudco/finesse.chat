@@ -1,6 +1,6 @@
 import { Controller } from "@hotwired/stimulus"
 
-const currentUser = document.querySelector('meta[name="current-user"]')?.content
+const currentUser = () => document.getElementById("current-username")?.textContent
 
 
 export default class extends Controller {
@@ -94,7 +94,7 @@ export default class extends Controller {
 
   editLastOwnMessage() {
     const last = [...this.messagesTarget.querySelectorAll("[data-message-author-value]")]
-      .findLast(el => el.dataset.messageAuthorValue === currentUser)
+      .findLast(el => el.dataset.messageAuthorValue === currentUser())
     if (!last) return
     this.application.getControllerForElementAndIdentifier(last, "message")?.startEdit()
   }
