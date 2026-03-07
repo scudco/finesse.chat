@@ -25,7 +25,7 @@
         </div>
       </div>
     </div>
-    <div class="flex items-center justify-between">
+    <div class="flex items-center gap-3">
       <% tooltips = { "polling" => "Fetch latest messages every 7.77s", "ws" => "Stream via WebSockets", "sse" => "Stream via Server-Sent Events" } %>
       <% transports = [["polling", "Polling"], ["ws", "WS"], ["sse", "SSE"]] %>
       <div class="flex text-xs font-medium rounded-lg border border-gray-200 dark:border-gray-700">
@@ -55,7 +55,7 @@
       <%= button_to bot_storm_messages_path,
             data: { controller: "cooldown", action: "click->cooldown#start", cooldown_duration_value: 5000 },
             form: { class: "contents" },
-            class: "btn-storm" do %>
+            class: "btn-storm flex-1 justify-center" do %>
         <span class="btn-storm-bar origin-left" data-cooldown-target="bar"></span>
         <span class="relative flex items-center gap-1">
           <span class="bolt-zap"><%= heroicon "bolt", variant: :solid, options: { class: "w-3.5 h-3.5 shrink-0" } %></span>

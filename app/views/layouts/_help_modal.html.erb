@@ -16,7 +16,7 @@
         <div class="flex flex-col items-center gap-3 text-center">
           <img src="/icon2.png" class="w-16 h-16 rounded-2xl shadow-sm" alt="Finesse Chat">
           <p class="text-gray-500 dark:text-gray-400">
-          This microapp was built to demonstrate the practical differences between
+          This microapp was <a href="https://adam.scud.co" target="_blank" class="underline hover:opacity-75">built by Adam</a> to demonstrate the practical differences between
           <span class="text-blue-600">Polling</span>,
           <span class="text-amber-500">WebSockets</span>,
           and
@@ -27,29 +27,32 @@
         </div>
 
         <section>
-          <h3 class="font-semibold font-sans text-gray-800 dark:text-gray-100 mb-2">The Three Transports</h3>
+          <h3 class="font-semibold font-sans text-gray-800 dark:text-gray-100 mb-2">Three Timely Transports</h3>
           <div class="space-y-2">
-            <div class="rounded-lg border border-blue-200 dark:border-blue-800 bg-blue-50 dark:bg-blue-950/40 px-3 py-2 text-gray-600 dark:text-gray-300"><span class="text-blue-600">Polling</span> will perform a regular old fetch every 7.77 seconds to get the latest messages. It is the simplest approach to updating data. Very reliable, but definitely not real-time. Great to have as a baseline and fallback.</div>
+            <div class="rounded-lg border border-blue-200 dark:border-blue-800 bg-blue-50 dark:bg-blue-950/40 px-3 py-2 text-gray-600 dark:text-gray-300">
+              <p class="mb-2"><span class="text-blue-600">Polling</span> will perform a regular old fetch every 7.77 seconds to get the latest messages. It is the simplest approach to updating data. Very reliable, but definitely not real-time.</p>
+              <p>In this app, <span class="text-blue-600">Polling</span> is not used as a fallback for <span class="text-amber-500">WebSockets</span> or <span class="text-teal-600">Server-Sent Events</span> so that those features' limitations are more clear. In a real app, you'd likely want polling always on to sync to server state.</p>
+            </div>
             <div class="rounded-lg border border-amber-200 dark:border-amber-800 bg-amber-50 dark:bg-amber-950/40 px-3 py-2 text-gray-600 dark:text-gray-300"><span class="text-amber-500">WebSockets</span> via SolidCable is available in Rails 8 without any real configuration needed. It is, however, more finicky when dealing with ordered data and reconnects. This was the fastest but least reliable transport in my testing.</div>
             <div class="rounded-lg border border-teal-200 dark:border-teal-800 bg-teal-50 dark:bg-teal-950/40 px-3 py-2 text-gray-600 dark:text-gray-300"><span class="text-teal-600">Server-Sent Events</span> being a long-lived HTTP connection means browsers work well with it by default. This app demonstrates its reliability and speed compared to WebSockets.</div>
           </div>
         </section>
 
-        <h3 class="font-semibold font-sans text-gray-800 dark:text-gray-100 mb-2">Features</h3>
         <section>
+          <h3 class="font-semibold font-sans text-gray-800 dark:text-gray-100 mb-2">The Big Red Button</h3>
+          <p class="text-gray-500 dark:text-gray-400 mb-2">
+            Inside the app, the Bot Storm button will fire a burst of messages from bots to demonstrate how each transport handles message flooding.
+          </p>
           <button class="btn-storm w-full mb-3 pointer-events-none select-none justify-center text-sm py-2" tabindex="-1" aria-hidden="true">
             <span class="bolt-zap">⚡</span> Bot Storm
           </button>
           <p class="text-gray-500 dark:text-gray-400 mb-2">
-            Inside the app, the Bot Storm button will fire a burst of messages from bots to demonstrate how each transport handles message flooding.
-          </p>
-          <p class="text-gray-500 dark:text-gray-400 mb-2">
-            When using <span class="font-sans inline-block px-1.5 py-0.5 rounded text-xs font-semibold bg-amber-500 text-white">WebSockets</span>, you can expect to see messages tagged with an <span class="font-sans inline-block px-1 py-0.5 rounded text-xs font-semibold bg-amber-400/20 text-amber-700 dark:text-amber-400 border border-amber-300 dark:border-amber-600">OUT OF ORDER</span> badge. This demonstrates that WebSockets messages have a decent potential of being received out of order.
+            When using <span class="text-amber-500">WebSockets</span>, you can expect to see messages tagged with an <span class="font-sans inline-block px-1 py-0.5 rounded text-xs font-semibold bg-amber-400/20 text-amber-700 dark:text-amber-400 border border-amber-300 dark:border-amber-600">OUT OF ORDER</span> badge. This demonstrates that WebSockets messages have a decent potential of being received out of order.
           </p>
         </section>
 
         <section>
-          <h3 class="font-semibold font-sans text-gray-800 dark:text-gray-100 mb-2">Tips</h3>
+          <h3 class="font-semibold font-sans text-gray-800 dark:text-gray-100 mb-2">Things To Know and Do During Your Stay</h3>
           <ul class="space-y-1.5 list-disc list-inside">
             <li>The chat resets every five minutes — the channel name rotates on each reset</li>
             <li>Most markdown is supported — **bold**, `code`, *italic*, and more</li>
@@ -60,7 +63,7 @@
         </section>
 
         <section>
-          <h3 class="font-semibold font-sans text-gray-800 dark:text-gray-100 mb-2">Slash Commands</h3>
+          <h3 class="font-semibold font-sans text-gray-800 dark:text-gray-100 mb-2">Secret Hacker Commands</h3>
           <dl class="space-y-1.5">
             <div class="flex gap-2">
               <dt class="font-mono text-teal-600 dark:text-teal-400 shrink-0 w-32">/help</dt>
