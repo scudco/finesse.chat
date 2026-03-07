@@ -103,7 +103,7 @@ export default class extends Controller {
     const stream = event.detail.newStream
     if (stream.target !== this.messagesTarget.id) return
 
-    if (this.transportValue !== "none" && this.hasTransportButtonTarget) {
+    if (this.transportValue !== "polling" && this.hasTransportButtonTarget) {
       this.#flashTransportButton()
     }
 
@@ -213,7 +213,7 @@ export default class extends Controller {
   }
 
   #schedulePoll() {
-    if (this.transportValue !== "none") return
+    if (this.transportValue !== "polling") return
     clearTimeout(this.pollTimeout)
     this.pollTimeout = setTimeout(() => this.pollForMessages(), this.pollIntervalValue)
   }

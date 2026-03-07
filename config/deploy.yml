@@ -1,5 +1,5 @@
-service: finesse
-image: scudco/finesse
+service: finesse.chat
+image: scudco/finesse.chat
 
 servers:
   web:
@@ -14,14 +14,14 @@ servers:
     cmd: bin/sse-server
     proxy:
       ssl: true
-      host: chat-sse.scud.co
+      host: sse.finesse.chat
       app_port: 4000
       healthcheck:
         path: /up
 
 proxy:
   ssl: true
-  host: chat.scud.co
+  host: finesse.chat
 
 registry:
   server: registry.digitalocean.com
@@ -36,7 +36,7 @@ env:
   clear:
     SOLID_QUEUE_IN_PUMA: false
     CABLE_DB_PATH: storage/production_cable.sqlite3
-    SSE_HOST: https://chat-sse.scud.co
+    SSE_HOST: https://sse.finesse.chat
 
 aliases:
   console: app exec --interactive --reuse "bin/rails console"

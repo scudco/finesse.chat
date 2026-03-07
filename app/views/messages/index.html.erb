@@ -26,15 +26,15 @@
       </div>
     </div>
     <div class="flex items-center justify-between">
-      <% tooltips = { "none" => "Fetch latest messages every 7.77s", "ws" => "Stream via WebSockets", "sse" => "Stream via Server-Sent Events" } %>
-      <% transports = [["none", "Polling"], ["ws", "WS"], ["sse", "SSE"]] %>
+      <% tooltips = { "polling" => "Fetch latest messages every 7.77s", "ws" => "Stream via WebSockets", "sse" => "Stream via Server-Sent Events" } %>
+      <% transports = [["polling", "Polling"], ["ws", "WS"], ["sse", "SSE"]] %>
       <div class="flex text-xs font-medium rounded-lg border border-gray-200 dark:border-gray-700">
         <% transports.each_with_index do |(value, label), i| %>
           <% first_item = i == 0; last_item = i == transports.size - 1 %>
           <% round = first_item ? "rounded-l-lg" : last_item ? "rounded-r-lg" : "" %>
           <% divider = last_item ? "" : "border-r border-gray-200 dark:border-gray-700" %>
           <div class="relative group <%= divider %>">
-            <% if @transport == value && value == "none" %>
+            <% if @transport == value && value == "polling" %>
               <%= link_to root_path(transport: value),
                     class: "block px-3 py-1.5 relative overflow-hidden bg-blue-700 text-white #{round}" do %>
                 <span class="absolute inset-0 bg-blue-600 origin-left" data-chat-target="pollBar"></span>
