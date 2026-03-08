@@ -4,7 +4,7 @@ A real-time group chat demo built with Rails 8. The focus is on exploring modern
 
 ---
 
-![Screenshot](docs/screenshot.webp)
+![Banner](docs/baner.png)
 
 ---
 
