@@ -12,6 +12,9 @@ servers:
     hosts:
       - DEPLOY_HOST
     cmd: bundle exec finesse --allow-origin "https://finesse.chat"
+    env:
+      clear:
+        BINDING: 0.0.0.0
     proxy:
       ssl: true
       host: sse.finesse.chat
