@@ -14,7 +14,7 @@ A real-time group chat demo built with Rails 8. The focus is on exploring modern
 - **SQLite** for all persistence — primary DB, job queue, Action Cable backend, and cache
 - **Hotwire** (Turbo Streams + Stimulus) for all interactivity
 - **Tailwind CSS v4** for styling
-- **Go** for an optional SSE server (`bin/sse-server`)
+- **Finesse** for an SSE server
 
 ## Features
 

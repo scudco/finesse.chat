@@ -6,6 +6,7 @@ module MessagesHelper
     # The stream name for broadcast_append_to("chat") is just "chat".
     channel = streamables.flatten.join(":")
     host    = ENV.fetch("SSE_HOST") { "#{request.scheme}://#{request.host}:4000" }
-    "#{host}/sse?channel=#{CGI.escape(channel)}"
+    signed = Turbo::StreamsChannel.signed_stream_name(channel)
+    "#{host}/events?signed_stream=#{CGI.escape(signed)}"
   end
 end

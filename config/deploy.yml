@@ -11,7 +11,7 @@ servers:
   sse:
     hosts:
       - DEPLOY_HOST
-    cmd: bin/sse-server
+    cmd: bundle exec finesse --allow-origin "https://finesse.chat"
     proxy:
       ssl: true
       host: sse.finesse.chat
@@ -35,7 +35,6 @@ env:
     - RAILS_MASTER_KEY
   clear:
     SOLID_QUEUE_IN_PUMA: false
-    CABLE_DB_PATH: storage/production_cable.sqlite3
     SSE_HOST: https://sse.finesse.chat
 
 aliases:

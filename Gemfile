@@ -69,3 +69,5 @@ group :test do
   gem "capybara"
   gem "selenium-webdriver"
 end
+
+gem "finesse", "0.1.0.beta1"

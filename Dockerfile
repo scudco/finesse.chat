@@ -10,12 +10,6 @@
 # Make sure RUBY_VERSION matches the Ruby version in .ruby-version
 ARG RUBY_VERSION=4.0.1
 
-# Build the Go SSE server for Linux
-FROM golang:alpine AS gobuild
-WORKDIR /build
-COPY lib/sse_server/ .
-RUN go build -o sse-server .
-
 FROM docker.io/library/ruby:$RUBY_VERSION-slim AS base
 
 # Rails app lives here
@@ -75,9 +69,6 @@ USER 1000:1000
 # Copy built artifacts: gems, application
 COPY --chown=rails:rails --from=build "${BUNDLE_PATH}" "${BUNDLE_PATH}"
 COPY --chown=rails:rails --from=build /rails /rails
-
-# Replace the macOS dev binary with the Linux build
-COPY --chown=rails:rails --from=gobuild /build/sse-server /rails/bin/sse-server
 
 # Entrypoint prepares the database.
 ENTRYPOINT ["/rails/bin/docker-entrypoint"]
