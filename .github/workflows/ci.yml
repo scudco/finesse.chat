@@ -148,5 +148,8 @@ jobs:
         with:
           ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
 
+      - name: Write Kamal secrets
+        run: printf "KAMAL_REGISTRY_USERNAME=%s\nKAMAL_REGISTRY_PASSWORD=%s\nRAILS_MASTER_KEY=%s\n" "$KAMAL_REGISTRY_USERNAME" "$KAMAL_REGISTRY_PASSWORD" "$RAILS_MASTER_KEY" > .kamal/secrets
+
       - name: Deploy with Kamal
         run: bin/kamal deploy
