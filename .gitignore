@@ -36,3 +36,6 @@
 
 /app/assets/builds/*
 !/app/assets/builds/.keep
+
+# Kamal secrets (no reason to leak password vault account details)
+/.kamal/secrets

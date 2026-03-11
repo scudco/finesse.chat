@@ -3,14 +3,15 @@ image: scudco/finesse.chat
 
 servers:
   web:
-    - DEPLOY_HOST
+    hosts:
+      - <%= ENV.fetch("DEPLOY_HOST") %>
   job:
     hosts:
-      - DEPLOY_HOST
+      - <%= ENV.fetch("DEPLOY_HOST") %>
     cmd: bin/jobs
   sse:
     hosts:
-      - DEPLOY_HOST
+      - <%= ENV.fetch("DEPLOY_HOST") %>
     cmd: bundle exec finesse --allow-origin "https://finesse.chat"
     env:
       clear:

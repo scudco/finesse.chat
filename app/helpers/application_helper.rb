@@ -50,12 +50,6 @@ module ApplicationHelper
     #db2777
   ].freeze
 
-  def highlight_code(code, language: :erb)
-    lexer     = Rouge::Lexer.find_fancy(language.to_s, code) || Rouge::Lexers::PlainText.new
-    formatter = Rouge::Formatters::HTMLInline.new(Rouge::Themes::Monokai)
-    raw("<code>#{formatter.format(lexer.lex(code))}</code>")
-  end
-
   def author_color(author)
     AUTHOR_COLORS[author.to_s.bytes.sum % AUTHOR_COLORS.length]
   end
