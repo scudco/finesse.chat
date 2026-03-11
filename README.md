@@ -1,6 +1,6 @@
-# Finesse
+# Finesse Chat
 
-A real-time group chat demo built with Rails 8. The focus is on exploring modern Rails primitives — Hotwire, SolidQueue, SolidCable — with no JavaScript framework and no Redis.
+A microapp built to demonstrate the practical differences between Polling, WebSockets, and Server-Sent Events. Built with Rails 8, Hotwire, and the [Finesse](https://github.com/scudco/finesse) gem.
 
 ---
 
@@ -8,25 +8,34 @@ A real-time group chat demo built with Rails 8. The focus is on exploring modern
 
 ---
 
-## Stack
+## Three Transports
 
-- **Ruby 4.0 / Rails 8.1** on Puma
-- **SQLite** for all persistence — primary DB, job queue, Action Cable backend, and cache
-- **Hotwire** (Turbo Streams + Stimulus) for all interactivity
-- **Tailwind CSS v4** for styling
-- **Finesse** for an SSE server
+- **Polling** — a fetch every 7.77 seconds to get the latest messages. The simplest approach to updating data. Very reliable, but definitely not real-time. In this app, Polling is not used as a fallback for WebSockets or SSE so that those features' limitations are more clear. In a real app, you'd likely want polling always on to sync to server state
+- **WebSockets** — via SolidCable, available in Rails 8 without any real configuration needed. More finicky when dealing with ordered data and reconnects. The fastest but least reliable transport in testing
+- **Server-Sent Events** — a long-lived HTTP connection that browsers work well with by default. This app demonstrates its reliability and speed compared to WebSockets
 
-## Features
+## Bot Storm
 
-- **Three real-time transports**, switchable at runtime: WebSocket (Action Cable via SolidCable), Server-Sent Events (custom Go server polling SQLite at 10ms), and long-poll fallback
-- **SolidQueue** powers background jobs and a recurring clear schedule — no Redis, no Sidekiq
-- **Markdown rendering** via Redcarpet with a custom renderer — fenced code blocks, inline formatting, blockquotes, and safe link handling
-- **Slash commands** (`/time`, `/meow`, `/woof`, `/wut <acronym>`, `/me`) handled asynchronously by a bot job; commands never echo the user's input
-- **Inline message editing and deletion** scoped to the current session, with focus and scroll management handled in Stimulus
-- **Dark/light/system theme** with localStorage persistence and an anti-flash inline script in `<head>`
-- **Automatic chat clearing** every 5 minutes via SolidQueue recurring job, broadcasting the empty state to all connected clients
-- **iOS Safari bfcache** handled via the `pageshow` + `persisted` event to prevent stale message views
-- **Bot Storm** enqueues a SolidQueue job that creates 100 messages in rapid succession — useful for stress-testing transport throughput, verifying scroll behaviour under load, and observing how each transport (WS, SSE, polling) handles a burst of events. Rate-limited to one active storm at a time.
+The Bot Storm button fires a burst of messages from bots to demonstrate how each transport handles message flooding. When using WebSockets, you can expect to see messages tagged with an **OUT OF ORDER** badge — demonstrating that WebSocket messages have a decent potential of being received out of order.
+
+## Things To Know
+
+- The chat resets every five minutes — the channel name rotates on each reset
+- Most markdown is supported — **bold**, `code`, *italic*, and more
+- Press `↑` in the empty input to edit your last message
+- Hover one of your messages to reveal edit/delete controls
+- Click the ↺ icon next to your username to get a new random username
+
+## Slash Commands
+
+| Command | Description |
+|---|---|
+| `/help` | Show a list of commands in chat |
+| `/time` | Post the current server time |
+| `/meow`, `/🐱` | Thanks for signing up for Cat Facts! |
+| `/woof`, `/🐶` | Dog Facts for the refined factician |
+| `/wut <acronym>` | Expand a tech acronym |
+| `/me <action>` | Post a third-person action |
 
 ## Development
 
@@ -35,7 +44,7 @@ bin/setup
 bin/dev
 ```
 
-`bin/dev` runs Rails, the Tailwind watcher, the Go SSE server, and SolidQueue via `Procfile.dev`.
+`bin/dev` runs Rails, the Tailwind watcher, the Finesse SSE server, and SolidQueue via `Procfile.dev`.
 
 ## Tests
 

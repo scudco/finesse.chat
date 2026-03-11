@@ -1,5 +1,5 @@
 module MessagesHelper
-  # Generates the URL for the Go SSE server for a given set of streamables,
+  # Generates the URL for the Finesse SSE server for a given set of streamables,
   # using the same signed stream name that broadcast_append_to writes to the DB.
   def sse_stream_url(*streamables)
     # SolidCable stores the raw stream name, not the signed variant.
