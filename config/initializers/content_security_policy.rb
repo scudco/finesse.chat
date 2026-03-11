@@ -10,7 +10,7 @@ Rails.application.configure do
     policy.font_src    :self, :data, "https://fonts.gstatic.com"
     policy.img_src     :self, :data
     policy.object_src  :none
-    policy.script_src  :self, "'unsafe-inline'"
+    policy.script_src  :self, "'unsafe-inline'", "https://static.cloudflareinsights.com"
     policy.style_src   :self, "'unsafe-inline'", "https://fonts.googleapis.com"
     policy.connect_src :self, ENV.fetch("SSE_HOST", "http://localhost:4000")
   end
