@@ -70,4 +70,4 @@ group :test do
   gem "selenium-webdriver"
 end
 
-gem "finesse", "0.1.0.beta1"
+gem "finesse", "0.1.0.beta2"
