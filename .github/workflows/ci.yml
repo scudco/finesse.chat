@@ -20,10 +20,10 @@ jobs:
 
       - name: Scan for common Rails security vulnerabilities using static analysis
         run: bin/brakeman --no-pager
-      
+
       - name: Scan for known security vulnerabilities in gems used
         run: bin/bundler-audit
-      
+
   scan_js:
     runs-on: ubuntu-latest
 
@@ -122,35 +122,3 @@ jobs:
           name: screenshots
           path: ${{ github.workspace }}/tmp/screenshots
           if-no-files-found: ignore
-
-  deploy:
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-    needs: [scan_ruby, scan_js, lint, test, system-test]
-    runs-on: ubuntu-latest
-    environment: production
-
-    env:
-      KAMAL_REGISTRY_USERNAME: ${{ secrets.KAMAL_REGISTRY_USERNAME }}
-      KAMAL_REGISTRY_PASSWORD: ${{ secrets.KAMAL_REGISTRY_PASSWORD }}
-      RAILS_MASTER_KEY: ${{ secrets.RAILS_MASTER_KEY }}
-      DEPLOY_HOST: ${{ secrets.DEPLOY_HOST }}
-
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v6
-
-      - name: Set up Ruby
-        uses: ruby/setup-ruby@v1
-        with:
-          bundler-cache: true
-
-      - name: Set up SSH
-        uses: webfactory/ssh-agent@v0.10.0
-        with:
-          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
-
-      - name: Write Kamal secrets
-        run: printf "KAMAL_REGISTRY_USERNAME=%s\nKAMAL_REGISTRY_PASSWORD=%s\nRAILS_MASTER_KEY=%s\n" "$KAMAL_REGISTRY_USERNAME" "$KAMAL_REGISTRY_PASSWORD" "$RAILS_MASTER_KEY" > .kamal/secrets
-
-      - name: Deploy with Kamal
-        run: bin/kamal deploy
