@@ -11,7 +11,7 @@
 # need percentage rollouts or runtime toggling without a deploy.
 module Feature
   FLAGS = {
-    # example_banner: false,
+    presence: false # "N online" roster in the chat header
   }.freeze
 
   ENABLED_VALUES = %w[1 true on enabled].freeze

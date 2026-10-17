@@ -1,4 +1,6 @@
 class PresencesController < ApplicationController
+  before_action { head :not_found unless Feature.enabled?(:presence, session) }
+
   # POST /presence  (turbo stream heartbeat, same on every transport)
   def create
     Presence.upsert({ username: current_username, last_seen_at: Time.current }, unique_by: :username)

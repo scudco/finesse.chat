@@ -84,7 +84,7 @@ class MessagesTest < ApplicationSystemTestCase
 
   %w[ws polling sse].each do |transport|
     test "presence roster lists the connected user over #{transport}" do
-      visit root_url(transport:) # ?transport= skips the help modal
+      visit root_url(transport:, enable_feature: "presence") # ?transport= skips the help modal
       username = find("#current-username").text
 
       # The page renders "0 online"; the first heartbeat replaces it.
@@ -92,5 +92,11 @@ class MessagesTest < ApplicationSystemTestCase
       # Tooltip is opacity-0 until hover; CI headless Chrome hover is unreliable.
       assert_selector "#presence div", text: username, visible: :all
     end
+  end
+
+  test "presence roster stays hidden while the flag is off" do
+    visit root_url(transport: "ws")
+    assert_selector "#current-username"
+    assert_no_selector "#presence"
   end
 end
