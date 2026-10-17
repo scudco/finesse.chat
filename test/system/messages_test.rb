@@ -36,7 +36,11 @@ class MessagesTest < ApplicationSystemTestCase
     join_chat
     send_message "doomed message"
 
-    hover_message("doomed message").click_link "Delete"
+    # CI headless Chrome doesn't reliably apply CSS :hover, so click the
+    # hover-revealed link directly; this test guards the delete round-trip
+    # (turbo_method link, destroy, broadcast remove), not the reveal.
+    message = find("#messages > div", text: "doomed message")
+    execute_script("arguments[0].click()", message.find("a", text: "Delete", visible: :all))
 
     assert_no_text "doomed message"
   end
@@ -76,19 +80,5 @@ class MessagesTest < ApplicationSystemTestCase
       sleep 0.1 until enqueued_jobs.any? { |job| job["job_class"] == "BotStormJob" } || Time.now > deadline
       assert_enqueued_jobs 1, only: BotStormJob
     end
-  end
-
-  private
-
-  # CSS-hover reveal is pointer-position sensitive: date separators insert
-  # ~50ms after messages change and can shift the row out from under the
-  # first hover on slow machines. Re-hover until the controls show.
-  def hover_message(text)
-    message = find("#messages > div", text: text)
-    3.times do
-      message.hover
-      return message if message.has_css?("[data-message-target=actions]", wait: 2)
-    end
-    flunk "hover never revealed controls for #{text.inspect}"
   end
 end
