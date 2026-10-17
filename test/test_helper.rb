@@ -2,6 +2,13 @@ ENV["RAILS_ENV"] ||= "test"
 require_relative "../config/environment"
 require "rails/test_help"
 
+# turbo-rails includes its broadcast test helper, which swaps in the in-memory
+# cable adapter, only once Action Cable's server class loads. Left lazy, the
+# first test to broadcast used the real solid_cable adapter, and its writer
+# thread then raced the next test's fixture transaction ("cannot start a
+# transaction within a transaction").
+ActionCable::Server::Base
+
 module ActiveSupport
   class TestCase
     # Run tests in parallel with specified workers
