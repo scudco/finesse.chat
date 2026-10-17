@@ -29,6 +29,17 @@ class PresencesControllerTest < ActionDispatch::IntegrationTest
     assert_operator Presence.find_by!(username: session[:username]).last_seen_at, :>, first_seen
   end
 
+  test "joins broadcast the roster on the chat stream; refreshes do not" do
+    heartbeat = -> { capture_turbo_stream_broadcasts("chat") { post presence_url, as: :turbo_stream } }
+
+    joined = heartbeat.call
+    assert_equal [ %w[replace presence] ], joined.map { |stream| [ stream["action"], stream["target"] ] }
+
+    travel(30.seconds) { assert_empty heartbeat.call }
+    # Aged out of the window, so the next heartbeat is a rejoin.
+    travel(Presence::WINDOW + 1.minute) { assert_equal 1, heartbeat.call.size }
+  end
+
   test "count stays exact while the tooltip caps at 50 names" do
     Presence.insert_all(Array.new(60) { |i| { username: "Bot#{i}", last_seen_at: Time.current } })
 

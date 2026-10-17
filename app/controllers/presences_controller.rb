@@ -3,7 +3,12 @@ class PresencesController < ApplicationController
 
   # POST /presence  (turbo stream heartbeat, same on every transport)
   def create
+    joined = !Presence.online.exists?(username: current_username)
     Presence.upsert({ username: current_username, last_seen_at: Time.current }, unique_by: :username)
-    render turbo_stream: turbo_stream.replace("presence", partial: "presences/presence")
+    # Push joins to WS and SSE clients at once. Polling clients and leaves
+    # still wait for the next heartbeat.
+    roster = render_to_string(partial: "presences/presence", formats: [ :html ])
+    Turbo::StreamsChannel.broadcast_replace_to("chat", target: "presence", html: roster) if joined
+    render turbo_stream: turbo_stream.replace("presence", roster)
   end
 end

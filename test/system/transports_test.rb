@@ -78,6 +78,27 @@ class SseTransportTest < ApplicationSystemTestCase
     end
   end
 
+  test "sse pushes a newcomer into the presence roster" do
+    join_chat
+
+    with_finesse_server do
+      visit root_url(transport: "sse", enable_feature: "presence")
+      wait_for_sse_connection
+      assert_selector "#presence", text: "1 online"
+      observer_heartbeat_at = Time.now
+
+      using_session :newcomer do
+        visit root_url(transport: "sse", enable_feature: "presence")
+        assert_selector "#presence", text: "2 online"
+      end
+
+      assert_selector "#presence", text: "2 online"
+      # The observer's own next heartbeat (30s) would also show "2 online";
+      # finishing first means the broadcast did it.
+      assert_operator Time.now - observer_heartbeat_at, :<, 30
+    end
+  end
+
   private
 
   # Boot the real Finesse Go binary against this worker's cable database and
