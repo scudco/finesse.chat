@@ -7,7 +7,8 @@ class PresencesController < ApplicationController
     Presence.upsert({ username: current_username, last_seen_at: Time.current }, unique_by: :username)
     # Push joins to WS and SSE clients at once. Polling clients and leaves
     # still wait for the next heartbeat.
-    Turbo::StreamsChannel.broadcast_replace_to("chat", target: "presence", partial: "presences/presence") if joined
-    render turbo_stream: turbo_stream.replace("presence", partial: "presences/presence")
+    roster = render_to_string(partial: "presences/presence", formats: [ :html ])
+    Turbo::StreamsChannel.broadcast_replace_to("chat", target: "presence", html: roster) if joined
+    render turbo_stream: turbo_stream.replace("presence", roster)
   end
 end
