@@ -1,8 +1,14 @@
+<%# Exact count, capped name list: fake sessions can inflate the roster cheaply. %>
+<% total = Presence.online.count %>
+<% names = Presence.online.order(:username).limit(50).pluck(:username) %>
 <div id="presence" class="relative group shrink-0 text-xs text-gray-500 dark:text-gray-400 cursor-default">
-  <%= usernames.size %> online
+  <%= total %> online
   <div class="absolute top-full right-0 mt-1.5 px-2 py-1 text-xs bg-gray-800 dark:bg-gray-700 text-white rounded whitespace-nowrap pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-150 z-50">
-    <% usernames.each do |username| %>
+    <% names.each do |username| %>
       <div><%= username %></div>
+    <% end %>
+    <% if total > names.size %>
+      <div class="text-gray-400">and <%= total - names.size %> more</div>
     <% end %>
   </div>
 </div>

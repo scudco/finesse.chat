@@ -3,5 +3,5 @@
 class Presence < ApplicationRecord
   WINDOW = 90.seconds
 
-  def self.online_usernames = where(last_seen_at: WINDOW.ago..).order(:username).pluck(:username)
+  scope :online, -> { where(last_seen_at: WINDOW.ago..) }
 end

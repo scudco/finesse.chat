@@ -17,7 +17,7 @@
     <div class="flex items-center justify-between gap-3">
       <h1 class="text-2xl font-bold font-mono break-all"><span id="channel_name"><%= @channel_name %></span></h1>
       <div class="flex items-center gap-3">
-        <%= render "presences/presence", usernames: Presence.online_usernames %>
+        <%= render "presences/presence" %>
         <div class="relative shrink-0" data-controller="countdown" data-action="click->countdown#toggleTooltip touchstart->countdown#toggleTooltip">
           <svg width="20" height="20" viewBox="0 0 20 20" class="rotate-[-90deg] opacity-0 transition-opacity duration-300" data-countdown-target="svg">
             <circle cx="10" cy="10" r="8" fill="none" stroke="currentColor" stroke-width="2" class="text-gray-200 dark:text-gray-700"/>

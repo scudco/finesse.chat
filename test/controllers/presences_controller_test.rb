@@ -26,4 +26,14 @@ class PresencesControllerTest < ActionDispatch::IntegrationTest
     assert_equal 1, Presence.where(username: session[:username]).count
     assert_operator Presence.find_by!(username: session[:username]).last_seen_at, :>, first_seen
   end
+
+  test "count stays exact while the tooltip caps at 50 names" do
+    Presence.insert_all(Array.new(60) { |i| { username: "Bot#{i}", last_seen_at: Time.current } })
+
+    post presence_url, as: :turbo_stream
+
+    assert_match "61 online", response.body
+    assert_equal 50, css_select("#presence div div:not(.text-gray-400)").size
+    assert_match "and 11 more", response.body
+  end
 end
