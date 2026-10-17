@@ -81,4 +81,16 @@ class MessagesTest < ApplicationSystemTestCase
       assert_enqueued_jobs 1, only: BotStormJob
     end
   end
+
+  %w[ws polling sse].each do |transport|
+    test "presence roster lists the connected user over #{transport}" do
+      visit root_url(transport:) # ?transport= skips the help modal
+      username = find("#current-username").text
+
+      # The page renders "0 online"; the first heartbeat replaces it.
+      assert_selector "#presence", text: "1 online"
+      # Tooltip is opacity-0 until hover; CI headless Chrome hover is unreliable.
+      assert_selector "#presence div", text: username, visible: :all
+    end
+  end
 end

@@ -7,6 +7,7 @@ Rails.application.routes.draw do
     end
   end
   resource :session, only: [ :update ]
+  resource :presence, only: [ :create ]
 
   get "up" => "rails/health#show", as: :rails_health_check
   get "manifest" => "rails/pwa#manifest", as: :pwa_manifest

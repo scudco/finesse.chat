@@ -10,12 +10,18 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_03_03_185714) do
+ActiveRecord::Schema[8.1].define(version: 2026_10_17_135608) do
   create_table "messages", force: :cascade do |t|
-    t.string "author", null: false
     t.text "content", null: false
+    t.string "author", null: false
     t.datetime "created_at", null: false
-    t.string "invoked_by"
     t.datetime "updated_at", null: false
+    t.string "invoked_by"
+  end
+
+  create_table "presences", force: :cascade do |t|
+    t.string "username", null: false
+    t.datetime "last_seen_at", null: false
+    t.index ["username"], name: "index_presences_on_username", unique: true
   end
 end

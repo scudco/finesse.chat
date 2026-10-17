@@ -5,7 +5,7 @@ const currentUser = () => document.getElementById("current-username")?.textConte
 
 export default class extends Controller {
   static targets = ["scroll", "messages", "jumpButton", "loadOlder", "hint", "input", "pollBar", "transportButton"]
-  static values  = { olderUrl: String, newerUrl: String, pollInterval: { type: Number, default: 20_000 }, transport: String }
+  static values  = { olderUrl: String, newerUrl: String, presenceUrl: String, pollInterval: { type: Number, default: 20_000 }, transport: String }
 
   connect() {
     this.atBottom          = true
@@ -16,6 +16,8 @@ export default class extends Controller {
     this.scrollToBottom()
     this.polling = false
     this.#schedulePoll()
+    this.#heartbeat()
+    this.heartbeatInterval = setInterval(() => this.#heartbeat(), 30_000)
     this.handleVisibilityChange = () => { if (document.visibilityState === "visible") this.#fetchLatest() }
     this.handlePageShow = (e) => { if (e.persisted) this.#fetchLatest() }
     document.addEventListener("visibilitychange", this.handleVisibilityChange)
@@ -42,6 +44,7 @@ export default class extends Controller {
 
   disconnect() {
     clearTimeout(this.pollTimeout)
+    clearInterval(this.heartbeatInterval)
     clearTimeout(this.loadOlderTimeout)
     clearTimeout(this.dateSepTimeout)
     clearTimeout(this.scrollBottomTimeout)
@@ -198,6 +201,19 @@ export default class extends Controller {
     }
 
     this.#schedulePoll()
+  }
+
+  // Presence heartbeat: same request on every transport, so the roster never
+  // depends on which connection (if any) the Rails server can see.
+  async #heartbeat() {
+    const response = await fetch(this.presenceUrlValue, {
+      method: "POST",
+      headers: {
+        Accept: "text/vnd.turbo-stream.html",
+        "X-CSRF-Token": document.querySelector("meta[name=csrf-token]")?.content
+      }
+    })
+    if (response.ok) await Turbo.renderStreamMessage(await response.text())
   }
 
   async #fetchLatest() {
