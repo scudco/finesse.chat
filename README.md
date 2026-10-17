@@ -54,7 +54,9 @@ bin/rails test:system   # system tests (headless Chrome)
 bin/rubocop             # linting
 ```
 
-CI runs all three on every pull request via GitHub Actions. Run `bin/ci` locally before pushing to catch issues early. To wire it up as a git hook:
+The system suite drives real Chrome through every message flow and proves live delivery on all three transports, including SSE through the actual Finesse server. CI also builds and boots the production Docker image before any deploy. The full standard, including feature flags for testing on main, lives in [docs/SHIPPING.md](docs/SHIPPING.md).
+
+CI runs everything on every pull request via GitHub Actions. Run `bin/ci` locally before pushing to catch issues early. To wire it up as a git hook:
 
 ```bash
 echo -e '#!/usr/bin/env bash\nset -e\nbin/ci' > .git/hooks/pre-push && chmod +x .git/hooks/pre-push

@@ -10,6 +10,15 @@ module ActiveSupport
     # Setup all fixtures in test/fixtures/*.yml for all tests in alphabetical order.
     fixtures :all
 
-    # Add more helper methods to be used by all tests here...
+    # Minitest 6 dropped minitest/mock; this is the slice of stubbing we need.
+    # Replaces a singleton method (e.g. Feature.flags) for the block's duration.
+    def stub_singleton(owner, name, value)
+      singleton = owner.singleton_class
+      original = singleton.instance_method(name)
+      singleton.define_method(name) { |*| value }
+      yield
+    ensure
+      singleton.define_method(name, original)
+    end
   end
 end

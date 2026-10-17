@@ -10,6 +10,16 @@ class MessagesControllerTest < ActionDispatch::IntegrationTest
     assert_response :success
   end
 
+  test "index stores a valid transport in the session and rejects unknown ones" do
+    get messages_url(transport: "polling")
+    assert_response :success
+    assert_equal "polling", session[:transport]
+
+    get messages_url(transport: "carrier-pigeon")
+    assert_response :success
+    assert_equal "polling", session[:transport]
+  end
+
   test "create saves message and returns turbo stream" do
     assert_difference "Message.count" do
       post messages_url,

@@ -134,3 +134,44 @@ jobs:
           name: screenshots
           path: ${{ github.workspace }}/tmp/screenshots
           if-no-files-found: ignore
+
+  deploy-validation:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v6
+
+      - name: Set up Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          bundler-cache: true
+
+      - name: Build production Docker image
+        run: docker build -t finesse-chat-ci .
+
+      - name: Boot container and smoke check
+        run: |
+          docker run -d --name app -p 3000:80 -e SECRET_KEY_BASE=$(openssl rand -hex 64) finesse-chat-ci
+          for i in $(seq 1 30); do
+            curl -fsS -o /dev/null http://localhost:3000/up && break
+            if [ "$i" = 30 ]; then echo "app never became healthy"; docker logs app; exit 1; fi
+            sleep 2
+          done
+          # Host header satisfies production host authorization, X-Forwarded-Proto
+          # satisfies force_ssl, and the UA satisfies allow_browser :modern.
+          curl -fsS -H "Host: finesse.chat" -H "X-Forwarded-Proto: https" \
+            -A "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0.0.0 Safari/537.36" \
+            http://localhost:3000/ | grep -q "Finesse Chat" || { echo "homepage smoke failed"; docker logs app; exit 1; }
+          docker rm -f app
+
+      - name: Validate Kamal deploy config
+        env:
+          DEPLOY_HOST: 203.0.113.10
+          KAMAL_REGISTRY_USERNAME: ci-dummy
+          KAMAL_REGISTRY_PASSWORD: ci-dummy
+          RAILS_MASTER_KEY: "0000000000000000000000000000000000000000000000000000000000000000"
+        run: |
+          printf "KAMAL_REGISTRY_USERNAME=%s\nKAMAL_REGISTRY_PASSWORD=%s\nRAILS_MASTER_KEY=%s\n" \
+            "$KAMAL_REGISTRY_USERNAME" "$KAMAL_REGISTRY_PASSWORD" "$RAILS_MASTER_KEY" > .kamal/secrets
+          bin/kamal config
