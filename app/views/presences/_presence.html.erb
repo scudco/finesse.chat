@@ -1,0 +1,8 @@
+<div id="presence" class="relative group shrink-0 text-xs text-gray-500 dark:text-gray-400 cursor-default">
+  <%= usernames.size %> online
+  <div class="absolute top-full right-0 mt-1.5 px-2 py-1 text-xs bg-gray-800 dark:bg-gray-700 text-white rounded whitespace-nowrap pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-150 z-50">
+    <% usernames.each do |username| %>
+      <div><%= username %></div>
+    <% end %>
+  </div>
+</div>

@@ -62,6 +62,7 @@ class SseTransportTest < ApplicationSystemTestCase
 
   teardown do
     Message.delete_all
+    Presence.delete_all # the page's heartbeat commits a row too
   end
 
   test "sse delivers messages through the finesse server" do
