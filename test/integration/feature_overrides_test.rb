@@ -2,7 +2,7 @@ require "test_helper"
 
 class FeatureOverridesTest < ActionDispatch::IntegrationTest
   test "enable and disable params set session overrides" do
-    stub_singleton Feature, :flags, { demo: false } do
+    stub_singleton Feature, :flags, Feature.flags.merge(demo: false) do # the page checks real flags too
       get root_url, params: { enable_feature: "demo" }
       assert_response :success
       assert_equal({ "demo" => true }, session[:features])

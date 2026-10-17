@@ -25,7 +25,7 @@ The Bot Storm button fires a burst of messages from bots to demonstrate how each
 - Press `↑` in the empty input to edit your last message
 - Hover one of your messages to reveal edit/delete controls
 - Click the ↺ icon next to your username to get a new random username
-- Hover "N online" in the header to see who is connected. Every transport sends the same heartbeat every 30 seconds, so joins show up within one beat and leaves drop off after 90 seconds
+- Hover "N online" in the header to see who is connected. Every transport sends the same heartbeat every 30 seconds, so joins show up within one beat and leaves drop off after 90 seconds. It is behind the `presence` feature flag for now; visit `/?enable_feature=presence` to turn it on for your session
 
 ## Slash Commands
 

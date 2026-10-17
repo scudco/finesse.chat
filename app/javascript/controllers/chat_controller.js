@@ -16,8 +16,10 @@ export default class extends Controller {
     this.scrollToBottom()
     this.polling = false
     this.#schedulePoll()
-    this.#heartbeat()
-    this.heartbeatInterval = setInterval(() => this.#heartbeat(), 30_000)
+    if (this.hasPresenceUrlValue) { // absent while the :presence flag is off
+      this.#heartbeat()
+      this.heartbeatInterval = setInterval(() => this.#heartbeat(), 30_000)
+    }
     this.handleVisibilityChange = () => { if (document.visibilityState === "visible") this.#fetchLatest() }
     this.handlePageShow = (e) => { if (e.persisted) this.#fetchLatest() }
     document.addEventListener("visibilitychange", this.handleVisibilityChange)

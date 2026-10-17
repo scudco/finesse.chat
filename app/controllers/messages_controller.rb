@@ -9,6 +9,7 @@ class MessagesController < ApplicationController
     @transport = session[:transport] || "ws"
     @messages = Message.order(:id).last(50)
     @channel_name = ChannelName.current
+    @presence_enabled = Feature.enabled?(:presence, session)
   end
 
   # POST /messages/bot_storm
