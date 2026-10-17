@@ -23,11 +23,10 @@ class MessagesTest < ApplicationSystemTestCase
     join_chat
     send_message "first draft"
 
-    message = find("#messages > div", text: "first draft")
-    message.hover
-    message.click_button "Edit"
-    message.find("textarea").set("final cut")
-    message.click_button "Save"
+    # ArrowUp in the empty input opens the editor for your last own message.
+    find("textarea[name='message[content]']").send_keys :arrow_up
+    find("#messages [data-message-target=editor] textarea:not([hidden])", visible: :all).set("final cut")
+    click_button "Save"
 
     assert_text "final cut"
     assert_no_text "first draft"
@@ -37,9 +36,7 @@ class MessagesTest < ApplicationSystemTestCase
     join_chat
     send_message "doomed message"
 
-    message = find("#messages > div", text: "doomed message")
-    message.hover
-    message.click_link "Delete"
+    hover_message("doomed message").click_link "Delete"
 
     assert_no_text "doomed message"
   end
@@ -79,5 +76,19 @@ class MessagesTest < ApplicationSystemTestCase
       sleep 0.1 until enqueued_jobs.any? { |job| job["job_class"] == "BotStormJob" } || Time.now > deadline
       assert_enqueued_jobs 1, only: BotStormJob
     end
+  end
+
+  private
+
+  # CSS-hover reveal is pointer-position sensitive: date separators insert
+  # ~50ms after messages change and can shift the row out from under the
+  # first hover on slow machines. Re-hover until the controls show.
+  def hover_message(text)
+    message = find("#messages > div", text: text)
+    3.times do
+      message.hover
+      return message if message.has_css?("[data-message-target=actions]", wait: 2)
+    end
+    flunk "hover never revealed controls for #{text.inspect}"
   end
 end
