@@ -124,7 +124,7 @@ class SseTransportTest < ApplicationSystemTestCase
       # Sent before this tab reconnects; it resumes from its last id.
       Message.create!(author: "Backstage", content: "after the hand-off")
       assert_text "after the hand-off"
-      assert_equal 2, finesse_connections
+      wait_for_sse_connection(2) # this tab took over the stream
     end
   end
 
@@ -170,7 +170,7 @@ class SseTransportTest < ApplicationSystemTestCase
   # lines. The EventSource lives inside finesse.js, so the server's log is the
   # reliable place to see it.
   def finesse_connections
-    File.read(FINESSE_LOG)[@finesse[:log_from]..].scan("client connected").size
+    File.binread(FINESSE_LOG)[@finesse[:log_from]..].scan("client connected").size
   end
 
   def free_port

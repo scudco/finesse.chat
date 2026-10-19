@@ -12,7 +12,7 @@ A microapp built to demonstrate the practical differences between Polling, WebSo
 
 - **Polling** — a fetch every 7.77 seconds to get the latest messages. The simplest approach to updating data. Very reliable, but definitely not real-time. In this app, Polling is not used as a fallback for WebSockets or SSE so that those features' limitations are more clear. In a real app, you'd likely want polling always on to sync to server state
 - **WebSockets** — via SolidCable, available in Rails 8 without any real configuration needed. More finicky when dealing with ordered data and reconnects. The fastest but least reliable transport in testing
-- **Server-Sent Events** — a long-lived HTTP connection that browsers work well with by default. This app demonstrates its reliability and speed compared to WebSockets. Tabs on the same stream share one connection: the first tab holds it and relays messages to the others. When that tab closes, or a page comes back through the back button, the stream picks up from the last message it saw
+- **Server-Sent Events** — a long-lived HTTP connection that browsers work well with by default. This app demonstrates its reliability and speed compared to WebSockets. Tabs on the same stream share one connection: the first tab holds it and relays messages to the others. When that tab closes, or the browser restores a page from its back/forward cache, the stream picks up from the last message it saw
 
 ## Bot Storm
 
