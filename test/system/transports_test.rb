@@ -70,7 +70,8 @@ class SseTransportTest < ApplicationSystemTestCase
 
     with_finesse_server do
       # Full navigation, not click_link "SSE": CSP is a document-level header,
-      # and a Turbo Drive visit would keep the pre-SSE_HOST policy alive.
+      # and a Turbo Drive visit would keep the policy from before
+      # config.finesse.url pointed at this server.
       visit root_url(transport: "sse")
       wait_for_sse_connection
       Message.create!(author: "Backstage", content: "hello via sse")
@@ -99,15 +100,47 @@ class SseTransportTest < ApplicationSystemTestCase
     end
   end
 
+  # finesse.js shares one EventSource per src across tabs through a Web Lock
+  # and a BroadcastChannel, and hands it to another tab when the leader goes.
+  test "sse tabs share one stream and hand it off when the leader closes" do
+    join_chat
+
+    with_finesse_server do
+      # Capybara can't close the primary window, so the leader is a new one.
+      leader = open_new_window
+      within_window(leader) do
+        visit root_url(transport: "sse")
+        wait_for_sse_connection
+      end
+      visit root_url(transport: "sse")
+      assert_selector "finesse-stream-source", visible: :all
+
+      Message.create!(author: "Backstage", content: "for every tab")
+      assert_text "for every tab"
+      within_window(leader) { assert_text "for every tab" }
+      assert_equal 1, finesse_connections, "the second tab should ride the leader's stream"
+
+      leader.close
+      # Sent before this tab reconnects; it resumes from its last id.
+      Message.create!(author: "Backstage", content: "after the hand-off")
+      assert_text "after the hand-off"
+      assert_equal 2, finesse_connections
+    end
+  end
+
   private
 
   # Boot the real Finesse Go binary against this worker's cable database and
-  # point SSE_HOST (read per-request by sse_stream_url and the CSP) at it.
+  # point config.finesse.url (read per request by finesse_stream_from and the
+  # CSP) at it.
   def with_finesse_server
+    finesse = Rails.application.config.finesse
+    previous_url = finesse.url
     server = Capybara.current_session.server
     origin = "http://#{server.host}:#{server.port}"
     db_path = File.expand_path(SolidCable::Record.connection_pool.db_config.database, Rails.root)
     port = free_port
+    log_from = File.size?(FINESSE_LOG).to_i
 
     pid = Process.spawn(
       { "FINESSE_SIGNING_KEY" => Finesse.signing_key, "BINDING" => "127.0.0.1" },
@@ -116,48 +149,55 @@ class SseTransportTest < ApplicationSystemTestCase
       "--db-path", db_path,
       "--allow-origin", origin,
       "--drain-timeout", "0s", # teardown needn't wait out the 25s production drain
-      out: [ Rails.root.join("tmp/finesse_test.log").to_s, "a" ], err: [ :child, :out ]
+      out: [ FINESSE_LOG.to_s, "a" ], err: [ :child, :out ]
     )
     wait_until_healthy "http://127.0.0.1:#{port}/up"
 
-    ENV["SSE_HOST"] = "http://127.0.0.1:#{port}"
-    @finesse = { pid:, port:, origin: }
+    finesse.url = "http://127.0.0.1:#{port}"
+    @finesse = { pid:, port:, origin:, log_from: }
     yield
   ensure
-    ENV.delete("SSE_HOST")
+    finesse.url = previous_url
     if pid
       Process.kill("TERM", pid)
       Process.wait(pid)
     end
   end
 
+  FINESSE_LOG = Rails.root.join("tmp/finesse_test.log")
+
+  # Streams this test's Finesse has accepted, from its "client connected" log
+  # lines. The EventSource lives inside finesse.js, so the server's log is the
+  # reliable place to see it.
+  def finesse_connections
+    File.read(FINESSE_LOG)[@finesse[:log_from]..].scan("client connected").size
+  end
+
   def free_port
     TCPServer.open("127.0.0.1", 0) { |socket| socket.addr[1] }
   end
 
-  # Finesse replays history only on reconnect (Last-Event-ID), so a broadcast
-  # sent before the EventSource finishes connecting would be lost. Wait for
-  # readyState OPEN before broadcasting.
-  def wait_for_sse_connection
-    assert_selector "turbo-stream-source", visible: :all
+  # Finesse replays history only to a reconnecting client (Last-Event-ID), so
+  # a broadcast sent before the first stream subscribes would be lost. Finesse
+  # logs the connection after subscribing; wait for that line.
+  def wait_for_sse_connection(count = 1)
+    assert_selector "finesse-stream-source", visible: :all
     deadline = Time.now + Capybara.default_max_wait_time
-    until evaluate_script("document.querySelector('turbo-stream-source')?.streamSource?.readyState") == 1
+    until finesse_connections >= count
       raise "SSE connection never opened: #{sse_diagnostics} #{finesse_diagnostics}" if Time.now > deadline
       sleep 0.05
     end
   end
 
-  # Browser-side view: src, readyState, and whether the page can reach the
-  # Finesse origin at all (distinguishes CSP/CORS blocks from 4xx responses).
+  # Browser-side view: src, and whether the page can reach the Finesse origin
+  # at all (distinguishes CSP/CORS blocks from 4xx responses).
   def sse_diagnostics
     evaluate_async_script(<<~JS)
       const done = arguments[0];
-      const el = document.querySelector("turbo-stream-source");
-      const src = el?.getAttribute("src");
-      const state = el?.streamSource?.readyState;
+      const src = document.querySelector("finesse-stream-source")?.getAttribute("src");
       fetch(new URL(src).origin + "/up")
-        .then(r => done({ src, state, up: r.status, page: location.origin }))
-        .catch(e => done({ src, state, fetchError: String(e), page: location.origin }));
+        .then(r => done({ src, up: r.status, page: location.origin }))
+        .catch(e => done({ src, fetchError: String(e), page: location.origin }));
     JS
   end
 

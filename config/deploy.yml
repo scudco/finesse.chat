@@ -39,7 +39,7 @@ env:
     - RAILS_MASTER_KEY
   clear:
     SOLID_QUEUE_IN_PUMA: false
-    SSE_HOST: https://sse.finesse.chat
+    FINESSE_URL: https://sse.finesse.chat
 
 aliases:
   console: app exec --interactive --reuse "bin/rails console"

@@ -8,7 +8,7 @@
      data-chat-poll-interval-value="7777"
      data-chat-transport-value="<%= @transport %>">
   <% if @transport == "sse" %>
-    <turbo-stream-source src="<%= sse_stream_url("chat") %>"></turbo-stream-source>
+    <%= finesse_stream_from "chat" %>
   <% elsif @transport == "ws" %>
     <%= turbo_stream_from "chat" %>
   <% end %>
