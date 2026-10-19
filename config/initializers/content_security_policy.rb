@@ -12,7 +12,7 @@ Rails.application.configure do
     policy.object_src  :none
     policy.script_src  :self, "'unsafe-inline'", "https://static.cloudflareinsights.com"
     policy.style_src   :self, "'unsafe-inline'", "https://fonts.googleapis.com"
-    # Lambda so tests can point SSE_HOST at an ephemeral Finesse server port.
-    policy.connect_src :self, -> { ENV.fetch("SSE_HOST", "http://localhost:4000") }
+    # Lambda so tests can point config.finesse.url at an ephemeral Finesse server port.
+    policy.connect_src :self, -> { Rails.application.config.finesse.url }
   end
 end
