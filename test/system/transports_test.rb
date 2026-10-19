@@ -115,6 +115,7 @@ class SseTransportTest < ApplicationSystemTestCase
       "--port", port.to_s,
       "--db-path", db_path,
       "--allow-origin", origin,
+      "--drain-timeout", "0s", # teardown needn't wait out the 25s production drain
       out: [ Rails.root.join("tmp/finesse_test.log").to_s, "a" ], err: [ :child, :out ]
     )
     wait_until_healthy "http://127.0.0.1:#{port}/up"
