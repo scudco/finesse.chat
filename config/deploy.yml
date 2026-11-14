@@ -38,7 +38,6 @@ env:
   secret:
     - RAILS_MASTER_KEY
   clear:
-    SOLID_QUEUE_IN_PUMA: false
     FINESSE_URL: https://sse.finesse.chat
 
 aliases:
