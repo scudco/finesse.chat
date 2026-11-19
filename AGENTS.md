@@ -17,9 +17,11 @@ Run the full `bin/ci` before every PR; it must pass. Steps live in `config/ci.rb
 
 ## Production
 
-Merging to `main` deploys to production: CI success on `main` triggers
-`.github/workflows/deploy.yml`, which runs `bin/kamal deploy`.
+Merging to `main` (the default branch) deploys to production automatically via GitHub Actions:
+CI success on `main` triggers `.github/workflows/deploy.yml`, which runs `bin/kamal deploy`.
 
-- Leave deploys to humans: never run `bin/kamal` deploy/rollback commands or the deploy workflow.
+- The forge operator merges PRs once the required checks pass. Agents never merge and never push to `main`.
+- Agents never deploy by hand: no `bin/kamal` or `kamal` commands, no `wrangler deploy` or `cf deploy`,
+  and never trigger or re-run the deploy workflow.
 - Never read or write production data or servers.
 - Ship unfinished work behind a feature flag (see docs/SHIPPING.md) so merging stays safe.
